@@ -75,6 +75,7 @@ private:
    * Params
    ****************************************/
 
+  ros::NodeHandle nh_;
   const unsigned history_length_;
   const double resolution_;
   const string fixed_frame_;
@@ -86,7 +87,6 @@ private:
    * Associated objects
    ****************************************/
 
-  ros::NodeHandle nh_;
   tf::TransformListener tf_;
   ros::Subscriber scan_sub_;
   ros::Publisher grid_pub_;
@@ -115,7 +115,7 @@ T getPrivateParam(const string& name, const T& default_value)
 
 GridConstructionNode::GridConstructionNode () :
   history_length_(getPrivateParam("history_length", 100)), resolution_(getPrivateParam("resolution", 0.1)),
-  fixed_frame_("odom"), sensor_frame_("base_laser_link"), 
+  fixed_frame_("map"), sensor_frame_("base_laser_link"), 
   grid_construction_interval_(getPrivateParam("grid_construction_interval", 0.3)),
   local_grid_size_(getPrivateParam("local_grid_size", 15.0)),
   scan_sub_(nh_.subscribe("base_scan", 1, &GridConstructionNode::scanCallback, this)),
@@ -162,8 +162,9 @@ void GridConstructionNode::scanCallback (const sm::LaserScan& scan)
     Lock lock(mutex_);
     last_cloud_=loc_cloud;
   }
-  catch (tf::LookupException& e) {
-    ROS_INFO ("Not saving scan due to tf lookup exception");
+  catch (tf::TransformException& e) {
+    ROS_INFO ("Not saving scan due to tf lookup exception: %s",
+              e.what());
   }
 }
 

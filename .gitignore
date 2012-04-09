@@ -1,2 +1,4 @@
 
 /stack.xml.bak
+/src/occupancy_grid_utils/msg/
+/src/occupancy_grid_utils/__init__.py
