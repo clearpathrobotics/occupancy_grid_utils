@@ -37,19 +37,25 @@
  */
 
 #include <occupancy_grid_utils/geometry.h>
+#include <queue>
+#include <set>
 
 namespace occupancy_grid_utils
 {
 
 typedef std::set<Cell> Cells;
 
-bool lineSegmentIntersectsCell (const nm::MapMetaData& info,
-                                const gm::Point32& p1,
-                                const gm::Point32& p2,
-                                const Cell& c)
+bool lineIntersectsCell (const nm::MapMetaData& info, const gm::Point32& p1,
+                         const gm::Point32& p2, const Cell& c)
 {
-
-
+  const float& x1 = p1.x;
+  const float& x2 = p1.y;
+  const float& y1 = p1.y;
+  const float& y2 = p2.y;
+  const float dx = x2-x1;
+  const float dy = y2-y1;
+  
+  const float a = dx/
 }
 
 bool boundaryIntersectsCell (const nm::MapMetaData& info,
@@ -59,44 +65,72 @@ bool boundaryIntersectsCell (const nm::MapMetaData& info,
   for (size_t i=0; i<poly.points.size(); i++)
   {
     const size_t j = i>0 ? i-1 : poly.points.size()-1;
-    if (lineSegmentIntersectsCell(info, poly.points[i],
+    if (lineIntersectsCell(info, poly.points[i],
                                   poly.points[j], c))
       return true;
   }
   return false;
 }
 
-Cells neighbors (const nm::MapMetaData& info,
-                 const Cell& c)
+// Visitor for the flood fill
+struct CellsInPolygon
 {
-  Cells neighbors;
-  
-}
+  CellsInPolygon (const nm::MapMetaData& info, const gm::Polygon& poly) :
+    info(info), poly(poly)
+  {}
 
-Cells cellsInConvexPolygon (const nm::MapMetaData& info,
-                            const gm::Polygon& poly)
-{
+  bool operator() (const Cell& c)
+  {
+    cells.insert(c);
+    return !boundaryIntersectsCell(info, poly, c);
+  }
+
   Cells cells;
-  Queue q;
-  q.push_back(center(poly));
+  const nm::MapMetaData& info;
+  const gm::Polygon& poly;
+};
+
+// Generic flood fill
+template <class Visitor>
+void flood_fill (const nm::MapMetaData& info, const Cell& start,
+                 Visitor& vis)
+{
+  Cells seen;
+  std::queue<Cell> q;
+  q.insert(start);
   while (!q.empty())
   {
     const Cell c = q.front();
     q.pop();
-    cells.insert(c);
-    if (!boundaryIntersectsCell(info, poly, c))
+    seen.insert(c);
+    if (vis(c))
     {
-      BOOST_FOREACH (const Cell& n, neighbors(c))
+      for (int vertical=0; vertical<2; vertical++)
       {
-        if (visited.find(n)==visited.end())
+        for (int d=-1; d<=1; d+=2)
         {
-          q.push_back(n);
+          const int dx = vertical ? 0 : d;
+          const int dy = vertical ? d : 0;
+          const Cell c2(c.x+dx, c.y+dy);
+          if (withinBounds(info, c2))
+            q.push_back(c2);
         }
       }
     }
-  
   }
-  return cells;
 }
+
+
+
+// We do this by starting at the center and flood-filling outwards till we
+// reach the boundary
+Cells cellsInConvexPolygon (const nm::MapMetaData& info,
+                            const gm::Polygon& poly)
+{
+  CellsInPolygon visitor(info, poly);
+  flood_fill(info, center(info, poly), visitor);
+  return visitor.cells;
+}
+
 
 } // namespace
