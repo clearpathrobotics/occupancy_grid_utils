@@ -22,6 +22,7 @@ rosbuild_add_library(grid_utils src/ray_tracer.cpp
                                 src/shortest_path.cpp
                                 src/coordinate_conversions.cpp
                                 src/combine_grids.cpp
+                                src/geometry.cpp
                                 src/file.cpp)
 target_link_libraries(grid_utils SDL SDL_image)
 

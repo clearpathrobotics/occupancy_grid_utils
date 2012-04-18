@@ -31,6 +31,7 @@
 #include <occupancy_grid_utils/exceptions.h>
 #include <occupancy_grid_utils/shortest_path.h>
 #include <occupancy_grid_utils/combine_grids.h>
+#include <occupancy_grid_utils/geometry.h>
 #include <gtest/gtest.h>
 #include <tf/transform_datatypes.h>
 #include <ros/ros.h>
@@ -50,6 +51,7 @@ using gu::Cell;
 using std::abs;
 using boost::bind;
 using std::vector;
+using std::set;
 using boost::assign::operator+=;
 using std::operator<<;
 
@@ -59,6 +61,7 @@ const double TOL=1e-6;
 
 
 typedef vector<Cell> Path;
+typedef set<Cell> Cells;
 typedef boost::shared_ptr<nm::OccupancyGrid> GridPtr;
 typedef boost::shared_ptr<nm::OccupancyGrid const> GridConstPtr;
 
@@ -72,11 +75,26 @@ bool samePath (const Path& p1, const Path& p2)
   return true;
 }
 
+template <class T>
+bool equalSets (const set<T>& s1, const set<T>& s2)
+{
+  BOOST_FOREACH (const T& x, s1) 
+  {
+    if (s2.find(x)==s2.end())
+      return false;
+  }
+  BOOST_FOREACH (const T& x, s2)
+  {
+    if (s1.find(x)==s1.end())
+      return false;
+  }
+  return true;
+}
+
 bool approxEqual (const double x, const double y)
 {
   return abs(x-y)<TOL;
 }
-
 
 
 namespace geometry_msgs
@@ -107,6 +125,15 @@ ostream& operator<< (ostream& str, const vector<T>& s)
   return str;
 }
 
+template <class T>
+ostream& operator<< (ostream& str, const set<T>& s)
+{
+  str << "{";
+  std::ostream_iterator<T> iter(str, ", ");
+  copy(s.begin(), s.end(), iter);
+  str << "}";
+  return str;
+}
 
 
 ostream& operator<< (ostream& str, const gm::Point& p)
@@ -530,7 +557,48 @@ TEST(GridUtils, InflateObstacles)
 
 }
 
+bool pred (const Cell& c)
+{
+  if (c.x==2 || c.y==2)
+    return false;
+  if (((c.x==1) || (c.x==3)) &&
+      ((c.y==1) || (c.y==3)))
+    return false;
+  return true;
+}
 
+TEST(GridUtils, Geometry)
+{
+  nm::MapMetaData info;
+  info.origin = makePose(.1,.1,0);
+  info.resolution = .10;
+  info.height = 5;
+  info.width = 5;
+
+  gm::Polygon poly;
+  poly.points.push_back(makePoint32(.41, .61));
+  poly.points.push_back(makePoint32(.43, .45));
+  poly.points.push_back(makePoint32(.51, .41));
+  poly.points.push_back(makePoint32(.8, .46));
+  poly.points.push_back(makePoint32(.78, .63));
+  
+  const Cells cells = gu::cellsInConvexPolygon(info, poly);
+  Cells expected;
+  expected.insert(Cell(4,4));
+  expected.insert(Cell(4,3));
+  expected.insert(Cell(3,4));
+  expected.insert(Cell(3,3));
+  EXPECT_EQ(expected, cells);
+  
+
+  Cells cells2 = gu::tileCells(info, 0.2, pred);
+  Cells expected2;
+  expected2.insert(Cell(0,0));
+  expected2.insert(Cell(0,3));
+  expected2.insert(Cell(3,0));
+  expected2.insert(Cell(3,4));
+  EXPECT_EQ(expected2, cells2);
+}
 
 
 TEST(GridUtils, CombineGrids)
@@ -593,6 +661,8 @@ TEST(GridUtils, CombineGrids)
   
   
 }
+
+
 
 
 

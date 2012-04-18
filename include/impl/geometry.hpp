@@ -31,38 +31,55 @@
 /**
  * \file 
  * 
- * Geometric operations
+ * Template functions from geometry.h
  *
  * \author Bhaskara Marthi
  */
 
-#ifndef OCCUPANCY_GRID_UTILS_GEOMETRY_H
-#define OCCUPANCY_GRID_UTILS_GEOMETRY_H
-
-#include "coordinate_conversions.h"
-#include <set>
 
 namespace occupancy_grid_utils
 {
 
+namespace nm=nav_msgs;
+typedef std::set<Cell> Cells;
 
-/// \retval Set of cells in the region bounded by convex polygon \a p
-///
-/// Cells that are partly in the polygon (because they intersect the
-/// boundary) are included.  Cells that intersect the polygon only along
-/// an edge or corner may or may not be included.
-std::set<Cell> cellsInConvexPolygon (const nav_msgs::MapMetaData& info,
-                                     const geometry_msgs::Polygon& p);
-
-
-/// \retval Locally maximal set of cells which are at least \a d apart in
-/// Euclidean distance, and all of which satisfy \a pred
 template <typename Pred>
-std::set<Cell> tileCells (const nav_msgs::MapMetaData& info, float d,
-                          const Pred& p);
+std::set<Cell> tileCells (const nm::MapMetaData& info, const float d,
+                          const Pred& pred)
+{
+  Cells cells;
+  Cells forbidden;
+  int rad = ceil(d/info.resolution);
+  for (size_t x=0; x<info.width; x++)
+  {
+    for (size_t y=0; y<info.height; y++)
+    {
+      const Cell c(x, y);
+      ROS_DEBUG_STREAM_NAMED ("tile", "Considering cell " << c);
+      if (forbidden.find(c)!=forbidden.end())
+        continue;
+      ROS_DEBUG_STREAM_NAMED ("tile", "  Sufficiently far");
+      if (forbidden.find(c)==forbidden.end() && pred(c))
+      {
+        cells.insert(c);
+        ROS_DEBUG_STREAM_NAMED ("tile", "  Inserted");
+        for (int dx=0; dx<=rad; dx++)
+        {
+          for (int dy=-rad; dy<=rad; dy++)
+          {
+            const Cell c2(int(x)+dx, int(y)+dy);
+            if (dx*dx+dy*dy <= rad*rad && withinBounds(info, c2))
+            {
+              ROS_DEBUG_STREAM_NAMED ("tile", "  Blocking " << c2);
+              forbidden.insert(c2);
+            }
+          }
+        }
+      }
+    }
+  }
+  return cells;
+}
+
 
 } // namespace
-
-#include "impl/geometry.hpp"
-
-#endif // include guard
