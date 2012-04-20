@@ -44,6 +44,7 @@ namespace occupancy_grid_utils
 {
 
 namespace nm=nav_msgs;
+namespace gm=geometry_msgs;
 
 using std::vector;
 using boost::optional;
@@ -90,7 +91,6 @@ boost::optional<double> distanceTo(ResultPtr res, const Cell& dest)
   else
     return d;
 }
-
 
 
 boost::optional<Path> extractPath(ResultPtr res, const Cell& dest)

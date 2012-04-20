@@ -567,6 +567,11 @@ bool pred (const Cell& c)
   return true;
 }
 
+bool not_pred (const Cell& c)
+{
+  return !pred(c);
+}
+
 TEST(GridUtils, Geometry)
 {
   nm::MapMetaData info;
@@ -598,6 +603,14 @@ TEST(GridUtils, Geometry)
   expected2.insert(Cell(3,0));
   expected2.insert(Cell(3,4));
   EXPECT_EQ(expected2, cells2);
+  
+  Cells cells3 = gu::tileCells(info, 0.2, not_pred);
+  Cells expected3;
+  expected3.insert(Cell(0,2));
+  expected3.insert(Cell(2,0));
+  expected3.insert(Cell(2,3));
+  expected3.insert(Cell(4,2));
+  EXPECT_EQ(expected3, cells3);
 }
 
 

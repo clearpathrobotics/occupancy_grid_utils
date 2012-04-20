@@ -47,6 +47,7 @@ template <typename Pred>
 std::set<Cell> tileCells (const nm::MapMetaData& info, const float d,
                           const Pred& pred)
 {
+  ROS_DEBUG_NAMED ("tile", "Tiling %ux%u map", info.height, info.width);
   Cells cells;
   Cells forbidden;
   int rad = ceil(d/info.resolution);
@@ -55,29 +56,29 @@ std::set<Cell> tileCells (const nm::MapMetaData& info, const float d,
     for (size_t y=0; y<info.height; y++)
     {
       const Cell c(x, y);
-      ROS_DEBUG_STREAM_NAMED ("tile", "Considering cell " << c);
+      if (!pred(c))
+        continue;
+      ROS_DEBUG_STREAM_NAMED("tile", "Cell " << c << " satisfies condition");
       if (forbidden.find(c)!=forbidden.end())
         continue;
       ROS_DEBUG_STREAM_NAMED ("tile", "  Sufficiently far");
-      if (forbidden.find(c)==forbidden.end() && pred(c))
+      cells.insert(c);
+      ROS_DEBUG_STREAM_NAMED ("tile", "  Inserted");
+      for (int dx=0; dx<=rad; dx++)
       {
-        cells.insert(c);
-        ROS_DEBUG_STREAM_NAMED ("tile", "  Inserted");
-        for (int dx=0; dx<=rad; dx++)
+        for (int dy=-rad; dy<=rad; dy++)
         {
-          for (int dy=-rad; dy<=rad; dy++)
+          const Cell c2(int(x)+dx, int(y)+dy);
+          if (dx*dx+dy*dy <= rad*rad && withinBounds(info, c2))
           {
-            const Cell c2(int(x)+dx, int(y)+dy);
-            if (dx*dx+dy*dy <= rad*rad && withinBounds(info, c2))
-            {
-              ROS_DEBUG_STREAM_NAMED ("tile", "  Blocking " << c2);
-              forbidden.insert(c2);
-            }
+            ROS_DEBUG_STREAM_NAMED ("tile", "  Blocking " << c2);
+            forbidden.insert(c2);
           }
         }
       }
     }
   }
+  ROS_DEBUG_NAMED("tile", "Done tiling");
   return cells;
 }
 

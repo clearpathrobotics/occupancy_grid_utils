@@ -128,6 +128,7 @@ boost::optional<double> distance(ResultPtr shortest_path_result, const Cell& des
 /// \retval Distance if path exists, uninitialized otherwise.  In meters, not cells.
 boost::optional<double> distanceTo(ResultPtr shortest_path_result, const Cell& dest);
 
+
 /// \brief deprecated
 boost::optional<double> distance(ResultPtr shortest_path_result, const Cell& dest);
 
