@@ -24,10 +24,23 @@ def make_pose(x, y, th):
 def time_to_ros(t):
     return rospy.Time(t.sec, t.nsec)
 
+def time_from_ros(t):
+    t2 = Time()
+    t2.sec = t.secs
+    t2.nsec = t.nsecs
+    return t2
+
 Time.to_ros = time_to_ros
 
 def header_to_ros(h):
     return rospy.Header(stamp=h.stamp.to_ros(), frame_id=h.frame_id)
+
+def header_from_ros(h):
+    h2 = Header()
+    h2.stamp = time_from_ros(h.stamp)
+    h2.frame_id = h.frame_id
+    return h2
+
 
 Header.to_ros = header_to_ros
 
@@ -72,12 +85,29 @@ def metadata_to_ros(m):
     return nm.MapMetaData(resolution=m.resolution, width=m.width,
                           height=m.height, origin=m.origin.to_ros())
 
+def metadata_from_ros(m):
+    m2 = MapMetaData()
+    m2.resolution = m.resolution
+    m2.height = m.height
+    m2.width = m.width
+    m2.origin = pose_from_ros(m.origin)
+    return m2
+
+
 MapMetaData.to_ros = metadata_to_ros
 
 
 def grid_to_ros(g):
     return nm.OccupancyGrid(data=g.data, header=g.header.to_ros(),
                             info=g.info.to_ros())
+
+def grid_from_ros(g):
+    g2 = OccupancyGrid()
+    g2.header = header_from_ros(g.header)
+    g2.data = Int8Vec()
+    g2.data[:] = g.data
+    g2.info = metadata_from_ros(g.info)
+    return g2
 
 OccupancyGrid.to_ros = grid_to_ros
 
@@ -91,5 +121,5 @@ def scan_to_ros(s):
                         #intensities=s.intensities
                         )
 
-LaserScan.to_ros = scan_to_ros
+# sm.LaserScan.to_ros = scan_to_ros
 

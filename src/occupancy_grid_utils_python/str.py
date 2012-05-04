@@ -56,7 +56,7 @@ Header.__str__ = header_str
 Time.__str__ = time_str
 MapMetaData.__str__ = info_str
 OccupancyGrid.__str__ = grid_str
-LaserScan.__str__ = scan_str
+# LaserScan.__str__ = scan_str
 Pose.__str__ = pose_str
 
 use_repr = True
@@ -68,7 +68,7 @@ if use_repr:
     Time.__repr__ = time_str
     MapMetaData.__repr__ = info_str
     OccupancyGrid.__repr__ = grid_str
-    LaserScan.__repr__ = scan_str
+    # LaserScan.__repr__ = scan_str
     Pose.__repr__ = pose_str
     Point.__repr__ = pt_str
     Quaternion.__repr__ = quaternion_str

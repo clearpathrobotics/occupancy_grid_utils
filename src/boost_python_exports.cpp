@@ -39,6 +39,7 @@
 #include <occupancy_grid_utils/coordinate_conversions.h>
 #include <occupancy_grid_utils/ray_tracer.h>
 #include <occupancy_grid_utils/file.h>
+#include <occupancy_grid_utils/shortest_path.h>
 #include <boost/python.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 
@@ -49,7 +50,60 @@ namespace nm=nav_msgs;
 namespace gm=geometry_msgs;
 namespace sm=sensor_msgs;
 using std::string;
+using std::vector;
 
+// STL exports
+void exportSTL ()
+{
+  using namespace boost::python;
+  class_<vector<int8_t> >("Int8Vec")
+    .def(vector_indexing_suite<vector<int8_t> >())
+    ;  
+}
+
+// Ros message exports
+// Should eventually be done via standard genmsg mechanisms
+void exportRosMessages()
+{
+  using namespace boost::python;
+  class_<std_msgs::Header>("Header")
+    .def_readwrite("stamp", &std_msgs::Header::stamp)
+    .def_readwrite("frame_id", &std_msgs::Header::frame_id);
+  
+  class_<ros::Time>("Time")
+    .def_readwrite("sec", &ros::Time::sec)
+    .def_readwrite("nsec", &ros::Time::nsec);
+
+  class_<gm::Point>("Point")
+    .def_readwrite("x", &gm::Point::x)
+    .def_readwrite("y", &gm::Point::y)
+    .def_readwrite("z", &gm::Point::z);
+  
+  class_<gm::Quaternion>("Quaternion")
+    .def_readwrite("x", &gm::Quaternion::x)
+    .def_readwrite("y", &gm::Quaternion::y)
+    .def_readwrite("z", &gm::Quaternion::z)
+    .def_readwrite("w", &gm::Quaternion::w);
+    
+  class_<gm::Pose>("Pose")
+    .def_readwrite("position", &gm::Pose::position)
+    .def_readwrite("orientation", &gm::Pose::orientation);
+
+  class_<nm::MapMetaData>("MapMetaData")
+    .def_readwrite("resolution", &nm::MapMetaData::resolution)
+    .def_readwrite("width", &nm::MapMetaData::width)
+    .def_readwrite("height", &nm::MapMetaData::height)
+    .def_readwrite("origin", &nm::MapMetaData::origin);
+
+  class_<nm::OccupancyGrid, nm::OccupancyGrid::Ptr>("OccupancyGrid")
+    .def_readwrite("header", &nm::OccupancyGrid::header)
+    .def_readwrite("info", &nm::OccupancyGrid::info)
+    .def_readwrite("data", &nm::OccupancyGrid::data);
+}
+
+/************************************************************
+ * Helpers
+ ************************************************************/
 
 void allocateGrid (nav_msgs::OccupancyGrid& grid)
 {
@@ -114,6 +168,9 @@ BOOST_PYTHON_MODULE(occupancy_grid_utils)
 {
   using namespace boost::python;
 
+  exportSTL();
+  exportRosMessages();
+
   /****************************************
    * Constants
    ****************************************/
@@ -151,6 +208,7 @@ BOOST_PYTHON_MODULE(occupancy_grid_utils)
   def("load_grid", loadGrid3);
   def("load_grid", loadGrid1);
   def("load_grid", loadGrid2);
+  def("inflate_obstacles", inflateObstacles);
 }
 
 } // namespace
