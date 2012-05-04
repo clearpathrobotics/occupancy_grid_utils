@@ -49,9 +49,9 @@ def point_to_ros(p):
 
 def point_from_ros(m):
     p = Point()
-    p.x = m.x
-    p.y = m.y
-    p.z = m.z
+    p.x = float(m.x)
+    p.y = float(m.y)
+    p.z = float(m.z)
     return p
 
 Point.to_ros = point_to_ros
