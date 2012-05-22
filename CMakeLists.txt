@@ -9,6 +9,9 @@ include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 #  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
 set(ROS_BUILD_TYPE RelWithDebInfo)
 
+find_package(Eigen REQUIRED)
+include_directories(${Eigen_INCLUDE_DIRS})
+
 rosbuild_init()
 rosbuild_genmsg()
 
@@ -45,7 +48,7 @@ target_link_libraries(occupancy_grid_utils grid_utils)
 target_link_libraries(occupancy_grid_utils ${PYTHON_LIBRARIES})
 rosbuild_link_boost(occupancy_grid_utils python)
 
-
 set_target_properties(occupancy_grid_utils
   PROPERTIES
   PREFIX "")
+

@@ -99,7 +99,7 @@ loadMapFromFile(nav_msgs::GetMap::Response* resp,
   resp->map.info.origin.position.y = *(origin+1);
   resp->map.info.origin.position.z = 0.0;
   btQuaternion q;
-  q.setRPY(0,0, *(origin+2));
+  q.setEuler(*(origin + 2), 0, 0);
   resp->map.info.origin.orientation.x = q.x();
   resp->map.info.origin.orientation.y = q.y();
   resp->map.info.origin.orientation.z = q.z();

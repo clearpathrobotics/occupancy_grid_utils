@@ -57,7 +57,7 @@ typedef boost::shared_ptr<nm::OccupancyGrid> GridPtr;
 typedef boost::shared_ptr<nm::OccupancyGrid const> GridConstPtr;
 
 
-inline gm::Point transformPt (const btTransform& trans, const gm::Point32& p)
+inline gm::Point transformPt (const tf::Pose& trans, const gm::Point32& p)
 {
   const btVector3 pt(p.x, p.y, p.z);
   gm::Point transformed;
@@ -140,10 +140,12 @@ void addCloud (OverlayClouds* overlay, LocalizedCloud::ConstPtr cloud, const int
   ROS_DEBUG_NAMED ("overlay", "Ray tracing from %.2f, %.2f", sensor_pos.x, sensor_pos.y);
 
   // Transform points to world frame
-  btTransform sensor_to_world;
+  tf::Pose sensor_to_world;
   tf::poseMsgToTF(cloud->sensor_pose, sensor_to_world);
   vector<gm::Point> transformed_points(cloud->cloud.points.size());
-  transform(cloud->cloud.points.begin(), cloud->cloud.points.end(), transformed_points.begin(),
+  transform(cloud->cloud.points.begin(), 
+            cloud->cloud.points.end(), 
+            transformed_points.begin(),
             bind(transformPt, ref(sensor_to_world), _1));
 
   // Iterate over points in this cloud

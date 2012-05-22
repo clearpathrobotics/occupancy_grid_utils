@@ -167,9 +167,9 @@ double maxY (const nm::MapMetaData& info)
   return max(p.points[0].y, max(p.points[1].y, max(p.points[2].y, p.points[3].y)));
 }
 
-gm::Pose transformPose (const btTransform trans, const gm::Pose p)
+gm::Pose transformPose (const tf::Pose trans, const gm::Pose p)
 {
-  btTransform pose;
+  tf::Pose pose;
   tf::poseMsgToTF(p, pose);
   gm::Pose transformed;
   tf::poseTFToMsg(trans*pose, transformed);
@@ -182,7 +182,7 @@ nm::MapMetaData getCombinedGridInfo (const vector<GridConstPtr>& grids, const do
   ROS_ASSERT (grids.size() > 0);
   nm::MapMetaData info;
   info.resolution = resolution;
-  btTransform trans;
+  tf::Pose trans;
   tf::poseMsgToTF(grids[0]->info.origin, trans);
 
   boost::optional<double> min_x, max_x, min_y, max_y;
