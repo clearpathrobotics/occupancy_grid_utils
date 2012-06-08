@@ -229,14 +229,14 @@ DistanceField distanceField (const nav_msgs::OccupancyGrid& m,
   DistanceField::ArrayPtr distances(new DistanceField::Array(dims));
   for (unsigned x=0; x<m.info.width; x++)
     for (unsigned y=0; y<m.info.height; y++)
-      (*distances)[x][y] = -42.42;
+      (*distances)[x][y] = max_dist;
   std::set<Cell> seen; // Set of cells that have already been added to distance field
   std::priority_queue<DistanceQueueItem> q;
 
   // Sweep over the grid and add all obstacles to the priority queue
   for (index_t i=0; i<m.info.width*m.info.height; i++)
   {
-    if (m.data[i]!=UNOCCUPIED)
+    if (m.data[i]!=UNOCCUPIED && m.data[i]!=UNKNOWN)
     {
       DistanceQueueItem item(indexCell(m.info, i), 0);
       q.push(item);
@@ -247,6 +247,9 @@ DistanceField distanceField (const nav_msgs::OccupancyGrid& m,
   while (!q.empty())
   {
     DistanceQueueItem item = q.top();
+    ROS_DEBUG_THROTTLE_NAMED (1.0, "distance_field",
+                              "Distance %.4f, %zu seen",
+                              item.distance, seen.size());
     q.pop();
 
     // If not already seen, add this cell to distance field, and 

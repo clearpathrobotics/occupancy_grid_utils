@@ -92,7 +92,7 @@ private:
 /// \param max_dist Distances will be threesholded at this value if
 /// it's positive
 DistanceField distanceField (const nav_msgs::OccupancyGrid& m,
-                             float max_dist=-1);
+                             float max_dist=-42);
 
 } // namespace
 
