@@ -75,6 +75,16 @@ bool samePath (const Path& p1, const Path& p2)
   return true;
 }
 
+void setOccupied (nm::OccupancyGrid* g, const unsigned x, const unsigned y)
+{
+  g->data[gu::cellIndex(g->info, Cell(x, y))] = gu::OCCUPIED;;
+}
+
+void setOccupied (GridPtr g, const unsigned x, const unsigned y)
+{
+  setOccupied(g.get(), x, y);
+}
+
 template <class T>
 bool equalSets (const set<T>& s1, const set<T>& s2)
 {
@@ -190,8 +200,38 @@ gm::Pose makePose (const double x, const double y, const double theta)
   return p;
 }
 
+float dist (const gu::DistanceField& d, int x, int y)
+{
+  return d[gu::Cell(x,y)];
+}
 
   
+TEST(GridUtils, DistanceField)
+{
+  nm::OccupancyGrid g;
+  g.info.height=5;
+  g.info.width=6;
+  g.data.resize(30);
+  g.info.resolution=0.5;
+  setOccupied(&g, 3, 1);
+  setOccupied(&g, 0, 4);
+  setOccupied(&g, 4, 3);
+  
+  gu::DistanceField d = gu::distanceField(g);
+  EXPECT_EQ(2, dist(d, 0, 0));
+  EXPECT_EQ(1.5, dist(d, 1, 0));
+  EXPECT_EQ(1, dist(d, 2, 0));
+  EXPECT_EQ(.5, dist(d, 3, 0));
+  EXPECT_EQ(1, dist(d, 4, 0));
+  EXPECT_EQ(0, dist(d, 3, 1));
+  EXPECT_EQ(0, dist(d, 0, 4));
+  EXPECT_EQ(1.5, dist(d, 1, 2));
+  EXPECT_EQ(1, dist(d, 1, 3));
+  EXPECT_EQ(1, dist(d, 2, 2));
+  EXPECT_EQ(1, dist(d, 2, 3));
+  EXPECT_EQ(.5, dist(d, 4, 4));
+
+}
 
 TEST(GridUtils, CoordinateConversions)
 {
@@ -356,16 +396,6 @@ TEST(GridUtils, GridOverlay)
 
   // Check header
   EXPECT_EQ(grid4->header.frame_id, "foo");
-}
-
-void setOccupied (nm::OccupancyGrid* g, const unsigned x, const unsigned y)
-{
-  g->data[gu::cellIndex(g->info, Cell(x, y))] = gu::OCCUPIED;;
-}
-
-void setOccupied (GridPtr g, const unsigned x, const unsigned y)
-{
-  setOccupied(g.get(), x, y);
 }
 
 

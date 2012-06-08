@@ -46,6 +46,7 @@ namespace occupancy_grid_utils
 
 namespace gm=geometry_msgs;
 namespace nm=nav_msgs;
+using std::vector;
 typedef std::set<Cell> Cells;
 
 struct Line
@@ -125,12 +126,13 @@ struct CellsInPolygon
 
 // Generic flood fill
 template <class Visitor>
-void flood_fill (const nm::MapMetaData& info, const Cell& start,
+void flood_fill (const nm::MapMetaData& info, const std::set<Cell>& start,
                  Visitor& vis)
 {
   Cells seen;
   std::queue<Cell> q;
-  q.push(start);
+  BOOST_FOREACH (const Cell& c, start) 
+    q.push(c);
   while (!q.empty())
   {
     const Cell c = q.front();
@@ -163,6 +165,16 @@ void flood_fill (const nm::MapMetaData& info, const Cell& start,
   }
 }
 
+// Generic flood fill 
+template <class Visitor>
+void flood_fill (const nm::MapMetaData& info, const Cell& start,
+                 Visitor& vis)
+{
+  std::set<Cell> s;
+  s.insert(start);
+  flood_fill(info, s, vis);
+}
+
 
 Cell center(const nm::MapMetaData& info,
             const gm::Polygon& poly)
@@ -188,6 +200,82 @@ Cells cellsInConvexPolygon (const nm::MapMetaData& info,
   CellsInPolygon visitor(info, poly);
   flood_fill(info, center(info, poly), visitor);
   return visitor.cells;
+}
+
+struct DistanceQueueItem
+{
+  DistanceQueueItem (const Cell& c, const float distance) :
+    c(c), distance(distance)
+  {}
+
+  inline
+  bool operator< (const DistanceQueueItem& other) const
+  {
+    // Higher priority means lower distance
+    return (distance > other.distance);
+  }
+  
+  Cell c;
+  float distance;
+};
+
+DistanceField distanceField (const nav_msgs::OccupancyGrid& m,
+                             const float max_dist)
+{
+  // Initialize
+  vector<unsigned> dims;
+  dims.push_back(m.info.width);
+  dims.push_back(m.info.height);
+  DistanceField::ArrayPtr distances(new DistanceField::Array(dims));
+  for (unsigned x=0; x<m.info.width; x++)
+    for (unsigned y=0; y<m.info.height; y++)
+      (*distances)[x][y] = -42.42;
+  std::set<Cell> seen; // Set of cells that have already been added to distance field
+  std::priority_queue<DistanceQueueItem> q;
+
+  // Sweep over the grid and add all obstacles to the priority queue
+  for (index_t i=0; i<m.info.width*m.info.height; i++)
+  {
+    if (m.data[i]!=UNOCCUPIED)
+    {
+      DistanceQueueItem item(indexCell(m.info, i), 0);
+      q.push(item);
+    }
+  }
+
+  // Iteration guaranteed to be in nondecreasing order of distance
+  while (!q.empty())
+  {
+    DistanceQueueItem item = q.top();
+    q.pop();
+
+    // If not already seen, add this cell to distance field, and 
+    // add its neighbors to the queue
+    if (seen.find(item.c)==seen.end())
+    {
+      seen.insert(item.c);
+      const Cell& c = item.c;
+      (*distances)[c.x][c.y] = item.distance;
+      if (max_dist>0 && item.distance>max_dist)
+        continue;
+      for (char vertical=0; vertical<2; vertical++)
+      {
+        for (char d=-1; d<=1; d+=2)
+        {
+          const char dx = vertical ? 0 : d;
+          const char dy = vertical ? d : 0;
+          const Cell neighbor(c.x+dx, c.y+dy);
+          if (withinBounds(m.info, neighbor))
+          {
+            const float dist = item.distance+m.info.resolution;
+            q.push(DistanceQueueItem(neighbor, dist));
+          }
+        }
+      }
+    }
+  }
+  
+  return DistanceField(distances);
 }
 
 

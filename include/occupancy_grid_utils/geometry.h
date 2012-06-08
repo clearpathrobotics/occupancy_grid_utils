@@ -41,6 +41,7 @@
 
 #include "coordinate_conversions.h"
 #include <set>
+#include <boost/multi_array.hpp>
 
 namespace occupancy_grid_utils
 {
@@ -60,6 +61,38 @@ std::set<Cell> cellsInConvexPolygon (const nav_msgs::MapMetaData& info,
 template <typename Pred>
 std::set<Cell> tileCells (const nav_msgs::MapMetaData& info, float d,
                           const Pred& p);
+
+
+/// Return value of distanceField function, that maps cells
+/// to their Euclidean distance to nearest obstacle
+class DistanceField
+{
+public:
+
+  typedef boost::multi_array<float, 2> Array;
+  typedef boost::shared_ptr<Array> ArrayPtr;
+
+  DistanceField (ArrayPtr distances) : distances_(distances) {}
+  
+  inline
+  float operator[] (const Cell& c) const
+  {
+    return (*distances_)[c.x][c.y];
+  };
+  
+private:
+
+  ArrayPtr distances_;
+};
+
+  
+
+/// \retval Distance field d, such that d[c] is the Manhattan distance
+/// (in meters) from cell c to an obstacle cell.
+/// \param max_dist Distances will be threesholded at this value if
+/// it's positive
+DistanceField distanceField (const nav_msgs::OccupancyGrid& m,
+                             float max_dist=-1);
 
 } // namespace
 
