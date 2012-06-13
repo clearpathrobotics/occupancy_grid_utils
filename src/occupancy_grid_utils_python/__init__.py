@@ -18,6 +18,17 @@ def make_pose(x, y, th):
     return p
 
 ############################################################
+# Python wrappers around library functions
+############################################################
+
+def nav_distance(nav_fn, dest):
+    res = sssp_distance_internal(nav_fn, dest)
+    if res>=0:
+        return res
+    else:
+        return None
+
+############################################################
 # Conversion to ROS message types so we can publish them
 ############################################################
 

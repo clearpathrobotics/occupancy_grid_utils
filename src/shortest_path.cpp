@@ -36,6 +36,7 @@
  * \author Bhaskara Marthi
  */
 
+#include "shortest_path_result.h"
 #include <occupancy_grid_utils/shortest_path.h>
 #include <ros/assert.h>
 #include <queue>
@@ -49,14 +50,6 @@ namespace gm=geometry_msgs;
 using std::vector;
 using boost::optional;
 using std::max;
-
-struct ShortestPathResult
-{
-  nm::MapMetaData info;
-  index_t src_ind;
-  vector<optional<index_t> > back_pointers;
-  vector<optional<double> > potential;
-};
 
 TerminationCondition::TerminationCondition () 
 {}

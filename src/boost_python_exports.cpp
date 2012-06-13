@@ -36,6 +36,7 @@
  * \author Bhaskara Marthi
  */
 
+#include "shortest_path_result.h"
 #include <occupancy_grid_utils/coordinate_conversions.h>
 #include <occupancy_grid_utils/ray_tracer.h>
 #include <occupancy_grid_utils/file.h>
@@ -162,7 +163,21 @@ withinBoundsPoint (const nm::MapMetaData& info, const gm::Point& p)
   return withinBounds(info, p);
 }
 
+ResultPtr sssp1 (const nav_msgs::OccupancyGrid& g, const Cell& start,
+                 const double max_dist)
+{
+  TerminationCondition term(max_dist);
+  return singleSourceShortestPaths(g, start, term, false);
+}
 
+double ssspDistance (ResultPtr res, const Cell& dest)
+{
+  boost::optional<double> dist = distanceTo(res, dest);
+  if (dist)
+    return *dist;
+  else
+    return -1;
+}
 
 BOOST_PYTHON_MODULE(occupancy_grid_utils)
 {
@@ -187,6 +202,10 @@ BOOST_PYTHON_MODULE(occupancy_grid_utils)
     .def_readwrite("x", &Cell::x)
     .def_readwrite("y", &Cell::y)
     ;
+  
+  class_<ShortestPathResult, ResultPtr >
+    ("ShortestPathResult")
+    ;
 
 
   /****************************************
@@ -209,6 +228,8 @@ BOOST_PYTHON_MODULE(occupancy_grid_utils)
   def("load_grid", loadGrid1);
   def("load_grid", loadGrid2);
   def("inflate_obstacles", inflateObstacles);
+  def("nav_fn", sssp1);
+  def("sssp_distance_internal", ssspDistance);
 }
 
 } // namespace

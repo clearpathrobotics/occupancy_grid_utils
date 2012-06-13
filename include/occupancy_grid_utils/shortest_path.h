@@ -71,7 +71,7 @@ nav_msgs::OccupancyGrid::Ptr inflateObstacles (const nav_msgs::OccupancyGrid& g,
  ************************************************************/
 
 struct ShortestPathResult;
-typedef boost::shared_ptr<const ShortestPathResult> ResultPtr;
+typedef boost::shared_ptr<ShortestPathResult> ResultPtr;
 typedef std::set<Cell> Cells;
 typedef std::vector<Cell> Path;
 typedef std::pair<Path, double> AStarResult;
