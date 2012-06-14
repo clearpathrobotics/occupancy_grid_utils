@@ -174,7 +174,10 @@ void addCloud (OverlayClouds* overlay, LocalizedCloud::ConstPtr cloud, const int
         // If the last cell equals the point (i.e., point is not off the grid), update hit counts
         const Cell last_cell = indexCell(overlay->grid.info, *last_ind);
         if (last_cell == pointCell(overlay->grid.info, p)) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuninitialized"
           overlay->hit_counts[*last_ind] += inc;
+#pragma GCC diagnostic pop
           ROS_ASSERT(overlay->hit_counts[*last_ind]>=0);
           ROS_DEBUG_NAMED ("overlay_counts", "  Hit counts for %d, %d are now %u", last_cell.x, last_cell.y, 
                            overlay->hit_counts[*last_ind]);

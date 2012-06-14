@@ -46,9 +46,11 @@ def quaternion_str(q):
         return str((q.x, q.y, q.z, q.w))
 
 def pose_str(p):
-    return "({0}, {1}".format(p.position, p.orientation)
+    return "({0}, {1})".format(p.position, p.orientation)
 
-
+def polygon_str(p):
+    s = ', '.join(pt_str(p) for p in p.points)
+    return "[Polygon with points {0}]".format(s)
 
 
 Cell.__str__ = cell_str
@@ -58,6 +60,10 @@ MapMetaData.__str__ = info_str
 OccupancyGrid.__str__ = grid_str
 # LaserScan.__str__ = scan_str
 Pose.__str__ = pose_str
+Point32.__str__ = pt_str
+Point.__str__ = pt_str
+Polygon.__str__ = polygon_str
+
 
 use_repr = True
 # These are technically incorrect, but make life easier in a shell
@@ -71,5 +77,7 @@ if use_repr:
     # LaserScan.__repr__ = scan_str
     Pose.__repr__ = pose_str
     Point.__repr__ = pt_str
+    Point32.__repr__ = pt_str
+    Polygon.__repr__ = polygon_str
     Quaternion.__repr__ = quaternion_str
 

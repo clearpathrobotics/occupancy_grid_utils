@@ -92,6 +92,26 @@ def pose_from_ros(m):
 
 Pose.to_ros = pose_to_ros
 
+def point32_to_ros(p):
+    return gm.Point32(x=p.x, y=p.y, z=p.z)
+
+def point32_from_ros(m):
+    p = Point32()
+    p.x = float(m.x)
+    p.y = float(m.y)
+    p.z = float(m.z)
+    return p
+
+Point32.to_ros = point32_to_ros
+
+def polygon_to_ros(p):
+    return gm.Polygon(points=p.points)
+
+def polygon_from_ros(m):
+    poly = Polygon()
+    poly.points[:] = [point32_from_ros(p) for p in m.points]
+    return poly
+
 def metadata_to_ros(m):
     return nm.MapMetaData(resolution=m.resolution, width=m.width,
                           height=m.height, origin=m.origin.to_ros())

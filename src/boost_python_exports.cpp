@@ -46,7 +46,7 @@
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 
 // Macro for boost python's convoluted syntax for exposing vector<T> to python
-#define BOOST_PYTHON_VECTOR(t, name) boost::python::class_<std::vector<t> >(#name) \
+#define BOOST_PYTHON_VECTOR(t, name) boost::python::class_<std::vector<t> >(name) \
   .def(boost::python::vector_indexing_suite<std::vector<t> >())
 
 // Macro due to boost python requiring operator== for any T for which you want vector<T>
