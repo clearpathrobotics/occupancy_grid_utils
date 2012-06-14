@@ -40,9 +40,21 @@
 #include <occupancy_grid_utils/coordinate_conversions.h>
 #include <occupancy_grid_utils/ray_tracer.h>
 #include <occupancy_grid_utils/file.h>
+#include <occupancy_grid_utils/geometry.h>
 #include <occupancy_grid_utils/shortest_path.h>
 #include <boost/python.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
+
+// Macro for boost python's convoluted syntax for exposing vector<T> to python
+#define BOOST_PYTHON_VECTOR(t, name) boost::python::class_<std::vector<t> >(#name) \
+  .def(boost::python::vector_indexing_suite<std::vector<t> >())
+
+// Macro due to boost python requiring operator== for any T for which you want vector<T>
+#define DEFINE_DUMMY_EQUALITY(ns, t) namespace ns {                     \
+                                     bool operator== (const t& x1, const t& x2) { return false; } \
+  } // namespace 
+
+DEFINE_DUMMY_EQUALITY(geometry_msgs, Point32)
 
 namespace occupancy_grid_utils
 {
@@ -52,14 +64,13 @@ namespace gm=geometry_msgs;
 namespace sm=sensor_msgs;
 using std::string;
 using std::vector;
+using std::set;
 
 // STL exports
 void exportSTL ()
 {
   using namespace boost::python;
-  class_<vector<int8_t> >("Int8Vec")
-    .def(vector_indexing_suite<vector<int8_t> >())
-    ;  
+  BOOST_PYTHON_VECTOR(int8_t, "Int8Vec");
 }
 
 // Ros message exports
@@ -80,6 +91,11 @@ void exportRosMessages()
     .def_readwrite("y", &gm::Point::y)
     .def_readwrite("z", &gm::Point::z);
   
+  class_<gm::Point32>("Point32")
+    .def_readwrite("x", &gm::Point32::x)
+    .def_readwrite("y", &gm::Point32::y)
+    .def_readwrite("z", &gm::Point32::z);
+  
   class_<gm::Quaternion>("Quaternion")
     .def_readwrite("x", &gm::Quaternion::x)
     .def_readwrite("y", &gm::Quaternion::y)
@@ -95,6 +111,11 @@ void exportRosMessages()
     .def_readwrite("width", &nm::MapMetaData::width)
     .def_readwrite("height", &nm::MapMetaData::height)
     .def_readwrite("origin", &nm::MapMetaData::origin);
+  
+  BOOST_PYTHON_VECTOR(gm::Point32, "Point32Vec");
+  
+  class_<gm::Polygon>("Polygon")
+    .def_readwrite("points", &gm::Polygon::points);
 
   class_<nm::OccupancyGrid, nm::OccupancyGrid::Ptr>("OccupancyGrid")
     .def_readwrite("header", &nm::OccupancyGrid::header)
@@ -179,6 +200,16 @@ double ssspDistance (ResultPtr res, const Cell& dest)
     return -1;
 }
 
+// Wrap the library function with one that returns a vector, so we
+// can export to python
+vector<Cell> cellVectorInConvexPolygon (const nm::MapMetaData& info,
+                                        const gm::Polygon& p)
+{
+  set<Cell> cells = cellsInConvexPolygon(info, p);
+  vector<Cell> cell_vec(cells.begin(), cells.end());
+  return cell_vec;
+}
+
 BOOST_PYTHON_MODULE(occupancy_grid_utils)
 {
   using namespace boost::python;
@@ -203,10 +234,11 @@ BOOST_PYTHON_MODULE(occupancy_grid_utils)
     .def_readwrite("y", &Cell::y)
     ;
   
+  BOOST_PYTHON_VECTOR(Cell, "CellVec");
+  
   class_<ShortestPathResult, ResultPtr >
     ("ShortestPathResult")
     ;
-
 
   /****************************************
    * Operations
@@ -230,6 +262,10 @@ BOOST_PYTHON_MODULE(occupancy_grid_utils)
   def("inflate_obstacles", inflateObstacles);
   def("nav_fn", sssp1);
   def("sssp_distance_internal", ssspDistance);
+  def("cells_in_convex_polygon", cellVectorInConvexPolygon);
 }
+
+
+
 
 } // namespace

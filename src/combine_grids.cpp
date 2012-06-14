@@ -184,6 +184,10 @@ nm::MapMetaData getCombinedGridInfo (const vector<GridConstPtr>& grids, const do
   info.resolution = resolution;
   tf::Pose trans;
   tf::poseMsgToTF(grids[0]->info.origin, trans);
+  
+  // Disable gcc's incorrect warning for boost optional
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuninitialized"
 
   boost::optional<double> min_x, max_x, min_y, max_y;
   BOOST_FOREACH (const GridConstPtr& g, grids) {
@@ -198,6 +202,8 @@ nm::MapMetaData getCombinedGridInfo (const vector<GridConstPtr>& grids, const do
     if (!(max_y && *max_y > maxY(grid_info)))
       max_y = maxY(grid_info);
   }
+  
+#pragma GCC diagnostic pop
 
   const double dx = *max_x - *min_x;
   const double dy = *max_y - *min_y;
