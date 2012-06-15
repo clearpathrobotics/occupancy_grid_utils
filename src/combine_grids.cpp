@@ -45,6 +45,8 @@
 #include <boost/bind.hpp>
 #include <boost/ref.hpp>
 #include <set>
+#include "gcc_version.h"
+
 
 namespace occupancy_grid_utils
 {
@@ -185,9 +187,11 @@ nm::MapMetaData getCombinedGridInfo (const vector<GridConstPtr>& grids, const do
   tf::Pose trans;
   tf::poseMsgToTF(grids[0]->info.origin, trans);
   
-  // Disable gcc's incorrect warning for boost optional
+
+#ifdef GRID_UTILS_GCC_46
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuninitialized"
+#endif
 
   boost::optional<double> min_x, max_x, min_y, max_y;
   BOOST_FOREACH (const GridConstPtr& g, grids) {
@@ -203,12 +207,13 @@ nm::MapMetaData getCombinedGridInfo (const vector<GridConstPtr>& grids, const do
       max_y = maxY(grid_info);
   }
   
+#ifdef GRID_UTILS_GCC_46
 #pragma GCC diagnostic pop
+#endif
 
   const double dx = *max_x - *min_x;
   const double dy = *max_y - *min_y;
   ROS_ASSERT ((dx > 0) && (dy > 0));
-
   gm::Pose pose_in_grid_frame;
   pose_in_grid_frame.position.x = *min_x;
   pose_in_grid_frame.position.y = *min_y;
