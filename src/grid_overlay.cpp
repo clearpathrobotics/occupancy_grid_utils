@@ -42,6 +42,7 @@
 #include <boost/bind.hpp>
 #include <boost/ref.hpp>
 #include <boost/optional.hpp>
+#include "gcc_version.h"
 
 namespace occupancy_grid_utils
 {
