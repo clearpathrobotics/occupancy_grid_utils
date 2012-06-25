@@ -52,3 +52,4 @@ set_target_properties(occupancy_grid_utils
   PROPERTIES
   PREFIX "")
 
+rosbuild_make_distribution(0.5.1)
