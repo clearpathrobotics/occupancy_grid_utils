@@ -78,17 +78,22 @@ typedef std::pair<Path, double> AStarResult;
 
 
 /// \brief Termination condition for shortest path search
-/// \a max_dist is a distance such that as soon as we see a cell with greater than this distance, we stop
+/// \a max_dist is a distance such that as soon as we see a cell with greater than this distance, we stop.
+/// Note that, confusingly, max_dist is in cells though shortest path returns meters by default.  Currently,
+/// we warn if use_cells is set to true below.  In future (H-turtle), this api will actually change to
+/// only allow meters.
 /// \a goals is a set such that once we've expanded all the cells in this set, we stop
 struct TerminationCondition
 {
   TerminationCondition ();
-  TerminationCondition (double max_distance);
+  TerminationCondition (double max_distance, bool use_cells=true);
   TerminationCondition (const Cells& goals);
-  TerminationCondition (const Cells& goals, const double max_distance);
+  TerminationCondition (const Cells& goals, const double max_distance,
+                        bool use_cells = true);
 
   boost::optional<double> max_distance_;
   boost::optional<std::set<Cell> > goals_;
+  bool use_cells_;
 };
 
 /// \brief Single source Dijkstra's algorithm

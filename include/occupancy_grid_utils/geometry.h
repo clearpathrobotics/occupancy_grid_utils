@@ -58,6 +58,7 @@ std::set<Cell> cellsInConvexPolygon (const nav_msgs::MapMetaData& info,
 
 /// \retval Locally maximal set of cells which are at least \a d apart in
 /// Euclidean distance, and all of which satisfy \a pred
+/// \tparam pred Defines operator(), a boolean predicate on Cell objects
 template <typename Pred>
 std::set<Cell> tileCells (const nav_msgs::MapMetaData& info, float d,
                           const Pred& p);

@@ -501,7 +501,7 @@ TEST(GridUtils, ShortestPath)
 
 
   // Termination conditions
-  const gu::TerminationCondition t1(4);
+  const gu::TerminationCondition t1(0.4, false);
   const gu::ResultPtr res3 = gu::singleSourceShortestPaths(*grid, c4, t1);
   EXPECT_PRED2(approxEqual, 0.1*(1+2*sqrt(2)), *distanceTo(res3, c1));
   EXPECT_TRUE(!distanceTo(res3, c2));
@@ -515,7 +515,7 @@ TEST(GridUtils, ShortestPath)
   EXPECT_PRED2(approxEqual, 0.1*(1+2*sqrt(2)), *distanceTo(res4, c1));
   EXPECT_TRUE(!distanceTo(res4, c6));
 
-  const gu::TerminationCondition t3(goals, 4);
+  const gu::TerminationCondition t3(goals, 0.4, false);
   const gu::ResultPtr res5 = gu::singleSourceShortestPaths(*grid, c4, t3);
   EXPECT_PRED2(approxEqual, 0.1*(1+2*sqrt(2)), *distanceTo(res5, c1));
   EXPECT_TRUE(!distanceTo(res5, c2));

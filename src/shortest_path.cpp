@@ -54,17 +54,30 @@ using std::max;
 TerminationCondition::TerminationCondition () 
 {}
 
-TerminationCondition::TerminationCondition (const double max_distance) :
-  max_distance_(max_distance)
-{}
+TerminationCondition::TerminationCondition (const double max_distance,
+                                            const bool use_cells) :
+  max_distance_(max_distance), use_cells_(use_cells)
+{
+  if (use_cells_)
+    ROS_WARN ("Deprecated usage of version of TerminationCondition that uses"
+              " distance in cells rather than meters.  This API will change"
+              " in a hard-to-debug way in future!");
+}
 
 TerminationCondition::TerminationCondition (const Cells& goals) :
   goals_(goals)
-{}
+{
+}
 
-TerminationCondition::TerminationCondition (const Cells& goals, const double max_distance) :
-  max_distance_(max_distance), goals_(goals)
-{}
+TerminationCondition::TerminationCondition (const Cells& goals, const double max_distance,
+                                            const bool use_cells) :
+  max_distance_(max_distance), goals_(goals), use_cells_(use_cells)
+{
+  if (use_cells_)
+    ROS_WARN ("Deprecated usage of version of TerminationCondition that uses"
+              " distance in cells rather than meters.  This API will change"
+              " in a hard-to-debug way in future!");
+}
 
 
 typedef vector<Cell> Path;
@@ -160,8 +173,10 @@ ResultPtr singleSourceShortestPaths (const nm::OccupancyGrid& g, const Cell& src
 
     const Cell cell = indexCell(g.info, i.ind);
     const double dist = i.potential;
-    if (t.max_distance_ && *t.max_distance_ < dist)
-      break;
+    const double dist_in_meters = dist*g.info.resolution;
+    if (t.max_distance_ && 
+        (*t.max_distance_ < (t.use_cells_ ? dist : dist_in_meters)))
+        break;
     if (t.goals_) {
       remaining_goals.erase(cell);
       if (remaining_goals.empty())
@@ -181,7 +196,10 @@ ResultPtr singleSourceShortestPaths (const nm::OccupancyGrid& g, const Cell& src
           const double new_dist = dist+d;
           if (g.data[ind]==UNOCCUPIED &&
               (!res->potential[ind] || *(res->potential[ind]) > new_dist) &&
-              (!t.max_distance_ || *t.max_distance_ >= new_dist)) {
+              (!t.max_distance_ ||
+               (t.use_cells_ && *t.max_distance_ >= new_dist) ||
+               (!t.use_cells_ && *t.max_distance_ >= new_dist*g.info.resolution)))
+          {
             ROS_DEBUG_NAMED ("shortest_path_propagation", "Adding cell %d, %d, at distance %.2f",
                              neighbor.x, neighbor.y, new_dist);
             res->potential[ind] = new_dist;
