@@ -60,7 +60,7 @@ typedef boost::shared_ptr<nm::OccupancyGrid const> GridConstPtr;
 
 inline gm::Point transformPt (const tf::Pose& trans, const gm::Point32& p)
 {
-  const btVector3 pt(p.x, p.y, p.z);
+  const tf::Vector3 pt(p.x, p.y, p.z);
   gm::Point transformed;
   tf::pointTFToMsg(trans*pt, transformed);
   return transformed;

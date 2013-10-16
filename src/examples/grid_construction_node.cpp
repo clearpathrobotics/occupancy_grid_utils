@@ -140,7 +140,7 @@ void GridConstructionNode::scanCallback (const sm::LaserScan& scan)
     }
 
     // Figure out current sensor position
-    tf::Pose identity(tf::createIdentityQuaternion(), btVector3(0, 0, 0));
+    tf::Pose identity(tf::createIdentityQuaternion(), tf::Vector3(0, 0, 0));
     tf::Stamped<tf::Pose> odom_pose;
     tf_.transformPose(fixed_frame_, tf::Stamped<tf::Pose> (identity, ros::Time(), sensor_frame_), odom_pose);
 

@@ -1,55 +1,75 @@
-cmake_minimum_required(VERSION 2.4.6)
-include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
+cmake_minimum_required(VERSION 2.8.3)
+project(occupancy_grid_utils)
 
-# Set the build type.  Options are:
-#  Coverage       : w/ debug symbols, w/o optimization, w/ code-coverage
-#  Debug          : w/ debug symbols, w/o optimization
-#  Release        : w/o debug symbols, w/ optimization
-#  RelWithDebInfo : w/ debug symbols, w/ optimization
-#  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
-set(ROS_BUILD_TYPE RelWithDebInfo)
+## Find catkin macros and libraries
+## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
+## is used, also find other catkin packages
+find_package(
+    catkin REQUIRED COMPONENTS 
+    sensor_msgs laser_geometry cv_bridge 
+    tf geometry_msgs pcl_ros pcl_conversions 
+    tf2_bullet roscpp std_msgs message_generation
+    message_runtime nav_msgs
+)
 
+find_package(Boost REQUIRED COMPONENTS system signals python)
 find_package(Eigen REQUIRED)
+find_package(PythonLibs REQUIRED)
+find_package(Bullet REQUIRED)
+
+## Generate messages in the 'msg' folder
+add_message_files(
+  FILES
+  OverlayClouds.msg
+  NavigationFunction.msg
+  LocalizedCloud.msg
+)
+
+## Generate added messages and services with any dependencies listed here
+generate_messages(
+  DEPENDENCIES
+  geometry_msgs
+  sensor_msgs
+  nav_msgs
+)
+
+catkin_package(
+  INCLUDE_DIRS include
+  LIBRARIES grid_utils occupancy_grid_utils
+  CATKIN_DEPENDS nav_msgs geometry_msgs sensor_msgs laser_geometry roscpp rospy map_server tf
+  DEPENDS system_lib
+)
+
+
+include_directories(include)
+include_directories(${catkin_INCLUDE_DIRS})
+include_directories(${PYTHON_INCLUDE_PATH})
 include_directories(${Eigen_INCLUDE_DIRS})
+include_directories(${BULLET_INCLUDE_DIR})
+link_libraries(${catkin_LIBRARIES})
+link_libraries(${PYTHON_LIBRARIES})
 
-rosbuild_init()
-rosbuild_genmsg()
-
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
-set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
-
-rosbuild_add_boost_directories()
-
-rosbuild_add_library(grid_utils src/ray_tracer.cpp
-                                src/grid_overlay.cpp
-                                src/shortest_path.cpp
-                                src/coordinate_conversions.cpp
-                                src/combine_grids.cpp
-                                src/geometry.cpp
-                                src/file.cpp)
+# Build
+add_library(grid_utils 
+    src/ray_tracer.cpp
+    src/grid_overlay.cpp
+    src/shortest_path.cpp
+    src/coordinate_conversions.cpp
+    src/combine_grids.cpp
+    src/geometry.cpp
+    src/file.cpp
+)
 target_link_libraries(grid_utils SDL SDL_image)
 
-rosbuild_add_gtest(test_grid_utils test/test_grid_utils.cpp)
-target_link_libraries(test_grid_utils grid_utils)
-
-rosbuild_add_executable(grid_construction_node
-                        src/examples/grid_construction_node.cpp)
+add_executable(grid_construction_node
+    src/examples/grid_construction_node.cpp)
 target_link_libraries(grid_construction_node
-                      grid_utils)
-
+    grid_utils)
 
 # Python stuff
-
-find_package(PythonLibs REQUIRED)
-include_directories(${PYTHON_INCLUDE_PATH})                    
-
-rosbuild_add_library(occupancy_grid_utils src/boost_python_exports.cpp)
+add_library(occupancy_grid_utils src/boost_python_exports.cpp)
 target_link_libraries(occupancy_grid_utils grid_utils)
-target_link_libraries(occupancy_grid_utils ${PYTHON_LIBRARIES})
-rosbuild_link_boost(occupancy_grid_utils python)
-
 set_target_properties(occupancy_grid_utils
   PROPERTIES
   PREFIX "")
 
-rosbuild_make_distribution(0.5.1)
