@@ -12,8 +12,10 @@ find_package(
     message_runtime nav_msgs
 )
 
+## Add find-modules and define external dependencies
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 find_package(Boost REQUIRED COMPONENTS system signals python)
-find_package(Eigen REQUIRED)
+find_package(Eigen3 REQUIRED)
 find_package(PythonLibs REQUIRED)
 find_package(Bullet REQUIRED)
 
@@ -46,8 +48,6 @@ include_directories(${catkin_INCLUDE_DIRS})
 include_directories(${PYTHON_INCLUDE_PATH})
 include_directories(${Eigen_INCLUDE_DIRS})
 include_directories(${BULLET_INCLUDE_DIR})
-link_libraries(${catkin_LIBRARIES})
-link_libraries(${PYTHON_LIBRARIES})
 
 # Build
 add_library(grid_utils 
@@ -59,16 +59,18 @@ add_library(grid_utils
     src/geometry.cpp
     src/file.cpp
 )
-target_link_libraries(grid_utils SDL SDL_image)
+add_dependencies(grid_utils occupancy_grid_utils_generate_messages_cpp)
+target_link_libraries(grid_utils SDL SDL_image ${catkin_LIBRARIES})
 
 add_executable(grid_construction_node
     src/examples/grid_construction_node.cpp)
+add_dependencies(grid_construction_node occupancy_grid_utils_generate_messages_cpp)
 target_link_libraries(grid_construction_node
-    grid_utils)
+    grid_utils ${catkin_LIBRARIES})
 
 # Python stuff
 add_library(occupancy_grid_utils src/boost_python_exports.cpp)
-target_link_libraries(occupancy_grid_utils grid_utils)
+target_link_libraries(occupancy_grid_utils grid_utils ${PYTHON_LIBRARIES} ${catkin_LIBRARIES})
 set_target_properties(occupancy_grid_utils
   PROPERTIES
   PREFIX "")
