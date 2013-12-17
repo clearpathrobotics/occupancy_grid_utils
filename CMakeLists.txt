@@ -37,7 +37,7 @@ generate_messages(
 
 catkin_package(
   INCLUDE_DIRS include
-  LIBRARIES grid_utils occupancy_grid_utils
+  LIBRARIES grid_utils grid_utils_boost_python_exports
   CATKIN_DEPENDS nav_msgs geometry_msgs sensor_msgs laser_geometry roscpp rospy map_server tf
   DEPENDS system_lib
 )
@@ -69,9 +69,5 @@ target_link_libraries(grid_construction_node
     grid_utils ${catkin_LIBRARIES})
 
 # Python stuff
-add_library(occupancy_grid_utils src/boost_python_exports.cpp)
-target_link_libraries(occupancy_grid_utils grid_utils ${PYTHON_LIBRARIES} ${catkin_LIBRARIES})
-set_target_properties(occupancy_grid_utils
-  PROPERTIES
-  PREFIX "")
-
+add_library(grid_utils_boost_python_exports src/boost_python_exports.cpp)
+target_link_libraries(grid_utils_boost_python_exports grid_utils ${PYTHON_LIBRARIES} ${catkin_LIBRARIES})
