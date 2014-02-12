@@ -6,10 +6,8 @@ project(occupancy_grid_utils)
 ## is used, also find other catkin packages
 find_package(
     catkin REQUIRED COMPONENTS 
-    sensor_msgs laser_geometry cv_bridge 
-    tf geometry_msgs pcl_ros pcl_conversions 
-    tf2_bullet roscpp std_msgs message_generation
-    message_runtime nav_msgs
+    nav_msgs geometry_msgs sensor_msgs laser_geometry
+    roscpp rospy tf tf2_bullet map_server message_generation
 )
 
 ## Add find-modules and define external dependencies
@@ -38,7 +36,7 @@ generate_messages(
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES grid_utils grid_utils_boost_python_exports
-  CATKIN_DEPENDS nav_msgs geometry_msgs sensor_msgs laser_geometry roscpp rospy map_server tf
+  CATKIN_DEPENDS nav_msgs geometry_msgs sensor_msgs laser_geometry roscpp rospy tf tf2_bullet map_server message_runtime
   DEPENDS system_lib
 )
 
