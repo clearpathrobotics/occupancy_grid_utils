@@ -74,7 +74,7 @@ target_link_libraries(grid_utils_boost_python_exports grid_utils ${PYTHON_LIBRAR
 ## Install ##
 #############
 ## Mark executables and/or libraries for installation
-install(TARGETS grid_construction_node 
+install(TARGETS grid_construction_node grid_utils grid_utils_boost_python_exports 
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
