@@ -2,6 +2,12 @@
 Changelog for package occupancy_grid_utils
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.0.3 (2014-02-16)
+------------------
+* remove dependency on SDL, which is terrible for CI build due to X server dependencies
+* fix crlf for package.xml
+* Contributors: y22ma
+
 0.0.2 (2014-02-13)
 ------------------
 
