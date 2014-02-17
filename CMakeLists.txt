@@ -7,7 +7,7 @@ project(occupancy_grid_utils)
 find_package(
     catkin REQUIRED COMPONENTS 
     nav_msgs geometry_msgs sensor_msgs laser_geometry
-    roscpp rospy tf tf2_bullet map_server message_generation
+    roscpp rospy tf tf2_bullet message_generation
 )
 
 ## Add find-modules and define external dependencies
@@ -16,6 +16,7 @@ find_package(Boost REQUIRED COMPONENTS system signals python)
 find_package(Eigen3 REQUIRED)
 find_package(PythonLibs REQUIRED)
 find_package(Bullet REQUIRED)
+find_package(OpenCV REQUIRED)
 
 ## Generate messages in the 'msg' folder
 add_message_files(
@@ -36,7 +37,7 @@ generate_messages(
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES grid_utils grid_utils_boost_python_exports
-  CATKIN_DEPENDS nav_msgs geometry_msgs sensor_msgs laser_geometry roscpp rospy tf tf2_bullet map_server message_runtime
+  CATKIN_DEPENDS nav_msgs geometry_msgs sensor_msgs laser_geometry roscpp rospy tf tf2_bullet message_runtime
   DEPENDS system_lib
 )
 
@@ -46,6 +47,7 @@ include_directories(${catkin_INCLUDE_DIRS})
 include_directories(${PYTHON_INCLUDE_PATH})
 include_directories(${Eigen_INCLUDE_DIRS})
 include_directories(${BULLET_INCLUDE_DIR})
+include_directories(${OpenCV_INCLUDE_DIRS})
 
 # Build
 add_library(grid_utils 
@@ -58,7 +60,7 @@ add_library(grid_utils
     src/file.cpp
 )
 add_dependencies(grid_utils occupancy_grid_utils_generate_messages_cpp)
-target_link_libraries(grid_utils SDL SDL_image ${catkin_LIBRARIES})
+target_link_libraries(grid_utils ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
 
 add_executable(grid_construction_node
     src/examples/grid_construction_node.cpp)

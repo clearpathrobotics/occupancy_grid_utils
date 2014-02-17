@@ -39,6 +39,8 @@
 #include <occupancy_grid_utils/file.h>
 #include <tf/transform_datatypes.h>
 #include <nav_msgs/GetMap.h>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 namespace occupancy_grid_utils
 {
@@ -59,8 +61,8 @@ namespace gm=geometry_msgs;
 #include <stdlib.h>
 #include <stdio.h>
 
-// We use SDL_image to load the image from disk
-#include <SDL/SDL_image.h>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 #include "LinearMath/btMatrix3x3.h"
 
@@ -72,28 +74,25 @@ loadMapFromFile(nav_msgs::GetMap::Response* resp,
                 const char* fname, double res, bool negate,
                 double occ_th, double free_th, double* origin)
 {
-  SDL_Surface* img;
+  cv::Mat img;
 
-  unsigned char* pixels;
-  unsigned char* p;
-  int rowstride, n_channels;
   unsigned int i,j;
-  int k;
   double occ;
-  int color_sum;
   double color_avg;
 
-  // Load the image using SDL.  If we get NULL back, the image load failed.
-  if(!(img = IMG_Load(fname)))
+  // Load the image using OpenCV.  If we get NULL data back, the image load failed.
+  cv::Mat imgColor = cv::imread( fname );
+  if(!imgColor.data)
   {
-    std::string errmsg = std::string("failed to open image file \"") + 
-      std::string(fname) + std::string("\"");
-    throw std::runtime_error(errmsg);
+      std::string errmsg = std::string("failed to open image file \"") +
+              fname + std::string("\"");
+      throw std::runtime_error(errmsg);
   }
+  cvtColor(imgColor, img, CV_BGR2GRAY);
 
   // Copy the image data into the map structure
-  resp->map.info.width = img->w;
-  resp->map.info.height = img->h;
+  resp->map.info.width = img.rows;
+  resp->map.info.height = img.cols;
   resp->map.info.resolution = res;
   resp->map.info.origin.position.x = *(origin);
   resp->map.info.origin.position.y = *(origin+1);
@@ -108,22 +107,13 @@ loadMapFromFile(nav_msgs::GetMap::Response* resp,
   // Allocate space to hold the data
   resp->map.data.resize(resp->map.info.width * resp->map.info.height);
 
-  // Get values that we'll need to iterate through the pixels
-  rowstride = img->pitch;
-  n_channels = img->format->BytesPerPixel;
-
   // Copy pixel data into the map structure
-  pixels = (unsigned char*)(img->pixels);
   for(j = 0; j < resp->map.info.height; j++)
   {
     for (i = 0; i < resp->map.info.width; i++)
     {
       // Compute mean of RGB for this pixel
-      p = pixels + j*rowstride + i*n_channels;
-      color_sum = 0;
-      for(k=0;k<n_channels;k++)
-        color_sum += *(p + (k));
-      color_avg = color_sum / (double)n_channels;
+      color_avg = (double)(img.at<uint8_t>(i, j));
 
       // If negate is true, we consider blacker pixels free, and whiter
       // pixels free.  Otherwise, it's vice versa.
@@ -143,8 +133,6 @@ loadMapFromFile(nav_msgs::GetMap::Response* resp,
         resp->map.data[MAP_IDX(resp->map.info.width,i,resp->map.info.height - j - 1)] = -1;
     }
   }
-
-  SDL_FreeSurface(img);
 }
 
 

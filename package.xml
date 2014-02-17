@@ -15,7 +15,6 @@
   <build_depend>rospy</build_depend>
   <build_depend>tf</build_depend>
   <build_depend>tf2_bullet</build_depend>
-  <build_depend>map_server</build_depend>
   <build_depend>message_generation</build_depend>
   <build_depend>eigen</build_depend>
 
@@ -25,7 +24,6 @@
   <run_depend>laser_geometry</run_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>rospy</run_depend>
-  <run_depend>map_server</run_depend>
   <run_depend>tf</run_depend>
   <run_depend>tf2_bullet</run_depend>
   <run_depend>message_runtime</run_depend>
