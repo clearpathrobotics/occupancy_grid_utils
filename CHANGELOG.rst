@@ -2,6 +2,11 @@
 Changelog for package occupancy_grid_utils
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.0.4 (2014-02-19)
+------------------
+* fixed a dependency issue with opencv
+* Contributors: y22ma
+
 0.0.3 (2014-02-16)
 ------------------
 * remove dependency on SDL, which is terrible for CI build due to X server dependencies
