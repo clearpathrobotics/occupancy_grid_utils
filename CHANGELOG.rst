@@ -5,6 +5,7 @@ Changelog for package occupancy_grid_utils
 
 0.0.4 (2014-02-19)
 ------------------
+* change libopencv-dev to opencv2, since libopencv-dev is not present in the rosdep database for precise
 * 0.0.4
 * update changelog
 * fixed a dependency issue with opencv
