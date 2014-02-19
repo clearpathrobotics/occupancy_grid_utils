@@ -2,8 +2,11 @@
 Changelog for package occupancy_grid_utils
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+
 0.0.4 (2014-02-19)
 ------------------
+* 0.0.4
+* update changelog
 * fixed a dependency issue with opencv
 * Contributors: y22ma
 
