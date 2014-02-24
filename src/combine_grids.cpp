@@ -207,14 +207,15 @@ nm::MapMetaData getCombinedGridInfo (const vector<GridConstPtr>& grids, const do
       max_y = maxY(grid_info);
   }
   ROS_ASSERT(min_x && max_x && min_y && max_y);
+
+  const double dx = *max_x - *min_x;
+  const double dy = *max_y - *min_y;
+  ROS_ASSERT ((dx > 0) && (dy > 0));
   
 #ifdef GRID_UTILS_GCC_46
 #pragma GCC diagnostic pop
 #endif
 
-  const double dx = *max_x - *min_x;
-  const double dy = *max_y - *min_y;
-  ROS_ASSERT ((dx > 0) && (dy > 0));
   gm::Pose pose_in_grid_frame;
   pose_in_grid_frame.position.x = *min_x;
   pose_in_grid_frame.position.y = *min_y;
