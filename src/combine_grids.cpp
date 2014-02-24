@@ -181,7 +181,7 @@ gm::Pose transformPose (const tf::Pose trans, const gm::Pose p)
 // Get the dimensions of a combined grid
 nm::MapMetaData getCombinedGridInfo (const vector<GridConstPtr>& grids, const double resolution)
 {
-  ROS_ASSERT (grids.size() > 0);
+  ROS_ASSERT (!grids.empty());
   nm::MapMetaData info;
   info.resolution = resolution;
   tf::Pose trans;
@@ -206,6 +206,7 @@ nm::MapMetaData getCombinedGridInfo (const vector<GridConstPtr>& grids, const do
     if (!(max_y && *max_y > maxY(grid_info)))
       max_y = maxY(grid_info);
   }
+  ROS_ASSERT(min_x && max_x && min_y && max_y);
   
 #ifdef GRID_UTILS_GCC_46
 #pragma GCC diagnostic pop
@@ -260,7 +261,7 @@ GridPtr combineGrids (const vector<GridConstPtr>& grids, const double resolution
 
 GridPtr combineGrids (const vector<GridConstPtr>& grids)
 {
-  ROS_ASSERT (grids.size()>0);
+  ROS_ASSERT (!grids.empty());
   return combineGrids(grids, grids[0]->info.resolution);
 }
 
