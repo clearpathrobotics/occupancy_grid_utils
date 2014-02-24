@@ -33,7 +33,7 @@ bool cellWithinBounds (const nm::MapMetaData& info, const Cell& c)
 optional<Cell> rayTraceOntoGrid (const nm::MapMetaData& info, const Cell& c1, const Cell& c2)
 {
   RayTraceIterRange r = rayTrace(c2, c1);
-  RayTraceIterator pos = std::find_if (r.first, r.second, bind(cellWithinBounds, ref(info), _1));
+  RayTraceIterator pos = std::find_if (r.first, r.second, bind(cellWithinBounds, boost::ref(info), _1));
   optional<Cell> c;
   if (pos!=r.second)
     c = *pos;

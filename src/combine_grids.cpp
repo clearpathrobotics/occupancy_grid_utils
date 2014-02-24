@@ -126,7 +126,7 @@ set<Cell> intersectingCells (const nm::MapMetaData& info, const nm::MapMetaData&
   // Figure out the candidates
   vector<Cell> corners(4);
   transform(poly.points.begin(), poly.points.end(), corners.begin(), 
-            bind(point32Cell, ref(info), _1));
+            bind(point32Cell, boost::ref(info), _1));
   const coord_t min_x=min(corners[0].x, min(corners[1].x, min(corners[2].x, corners[3].x)));
   const coord_t min_y=min(corners[0].y, min(corners[1].y, min(corners[2].y, corners[3].y)));
   const coord_t max_x=max(corners[0].x, max(corners[1].x, max(corners[2].x, corners[3].x)));
