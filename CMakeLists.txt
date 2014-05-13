@@ -70,7 +70,7 @@ target_link_libraries(grid_construction_node
 
 # Python stuff
 add_library(grid_utils_boost_python_exports src/boost_python_exports.cpp)
-target_link_libraries(grid_utils_boost_python_exports grid_utils ${PYTHON_LIBRARIES} ${catkin_LIBRARIES})
+target_link_libraries(grid_utils_boost_python_exports grid_utils ${PYTHON_LIBRARIES} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
 #############
 ## Install ##
