@@ -126,7 +126,7 @@ set<Cell> intersectingCells (const nm::MapMetaData& info, const nm::MapMetaData&
   // Figure out the candidates
   vector<Cell> corners(4);
   transform(poly.points.begin(), poly.points.end(), corners.begin(), 
-            bind(point32Cell, ref(info), _1));
+            bind(point32Cell, boost::ref(info), _1));
   const coord_t min_x=min(corners[0].x, min(corners[1].x, min(corners[2].x, corners[3].x)));
   const coord_t min_y=min(corners[0].y, min(corners[1].y, min(corners[2].y, corners[3].y)));
   const coord_t max_x=max(corners[0].x, max(corners[1].x, max(corners[2].x, corners[3].x)));
@@ -181,7 +181,7 @@ gm::Pose transformPose (const tf::Pose trans, const gm::Pose p)
 // Get the dimensions of a combined grid
 nm::MapMetaData getCombinedGridInfo (const vector<GridConstPtr>& grids, const double resolution)
 {
-  ROS_ASSERT (grids.size() > 0);
+  ROS_ASSERT (!grids.empty());
   nm::MapMetaData info;
   info.resolution = resolution;
   tf::Pose trans;
@@ -206,14 +206,16 @@ nm::MapMetaData getCombinedGridInfo (const vector<GridConstPtr>& grids, const do
     if (!(max_y && *max_y > maxY(grid_info)))
       max_y = maxY(grid_info);
   }
+  ROS_ASSERT(min_x && max_x && min_y && max_y);
+
+  const double dx = *max_x - *min_x;
+  const double dy = *max_y - *min_y;
+  ROS_ASSERT ((dx > 0) && (dy > 0));
   
 #ifdef GRID_UTILS_GCC_46
 #pragma GCC diagnostic pop
 #endif
 
-  const double dx = *max_x - *min_x;
-  const double dy = *max_y - *min_y;
-  ROS_ASSERT ((dx > 0) && (dy > 0));
   gm::Pose pose_in_grid_frame;
   pose_in_grid_frame.position.x = *min_x;
   pose_in_grid_frame.position.y = *min_y;
@@ -260,7 +262,7 @@ GridPtr combineGrids (const vector<GridConstPtr>& grids, const double resolution
 
 GridPtr combineGrids (const vector<GridConstPtr>& grids)
 {
-  ROS_ASSERT (grids.size()>0);
+  ROS_ASSERT (!grids.empty());
   return combineGrids(grids, grids[0]->info.resolution);
 }
 
