@@ -3,6 +3,15 @@ Changelog for package occupancy_grid_utils
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
+Forthcoming
+-----------
+* Changed OpenCV dependency to 'cv_bridge' to work on hydro and indigo
+* Compile in Boost libraries
+* Fix compilation, gcc doesn't like use of the optional vars
+* Fix some cppcheck warnings
+* Use boost::ref(), not just ref()
+* Contributors: Alex Bencz, Jonathan Jekir, Mike Purvis, Siegfried-A. Gevatter Pujals
+
 0.0.4 (2014-02-19)
 ------------------
 * change libopencv-dev to opencv2, since libopencv-dev is not present in the rosdep database for precise
