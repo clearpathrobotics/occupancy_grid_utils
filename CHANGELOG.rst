@@ -3,8 +3,8 @@ Changelog for package occupancy_grid_utils
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-Forthcoming
------------
+0.0.5 (2015-02-25)
+------------------
 * Changed OpenCV dependency to 'cv_bridge' to work on hydro and indigo
 * Compile in Boost libraries
 * Fix compilation, gcc doesn't like use of the optional vars
