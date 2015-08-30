@@ -3,8 +3,8 @@ Changelog for package occupancy_grid_utils
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-Forthcoming
------------
+0.0.6 (2015-08-30)
+------------------
 * Fix non-installed *.hpp headers
 * Contributors: Enrique Fernandez
 
