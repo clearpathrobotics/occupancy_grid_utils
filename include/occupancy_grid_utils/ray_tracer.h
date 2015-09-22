@@ -19,6 +19,14 @@ namespace occupancy_grid_utils
 
 typedef std::pair<RayTraceIterator, RayTraceIterator> RayTraceIterRange;
 
+inline double euclideanDistance (const geometry_msgs::Point& p1, const geometry_msgs::Point& p2)
+{
+  const double dx=p1.x-p2.x;
+  const double dy=p1.y-p2.y;
+  const double dz=p1.z-p2.z;
+  return sqrt(dx*dx + dy*dy + dz*dz);
+}
+
 /// \brief Returns an iterator range over the cells on the 
 /// line segment between two points (inclusive).  
 /// \param project_target_onto_grid If true, \a p2 may be off the grid, in which case the ray
@@ -33,7 +41,7 @@ typedef std::pair<RayTraceIterator, RayTraceIterator> RayTraceIterRange;
 /// in for loops, std::for_each, etc.
 RayTraceIterRange rayTrace (const nav_msgs::MapMetaData& info, const geometry_msgs::Point& p1, 
                             const geometry_msgs::Point& p2, bool project_target_onto_grid=false,
-                            bool project_source_onto_grid=false);
+                            bool project_source_onto_grid=false, float max_range = -1);
 
 
 /************************************************************
