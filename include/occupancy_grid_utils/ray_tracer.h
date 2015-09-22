@@ -33,6 +33,7 @@ inline double euclideanDistance (const geometry_msgs::Point& p1, const geometry_
 /// stops right before falling off the grid
 /// \param project_source_onto_grid If true, \a p1 may be off the grid, in which case the
 /// ray starts at the point where it enters the grid
+/// \param max_range The maximum range to raycast a point out to
 /// \throws PointOutOfBoundsException if \a p1 is off grid and project_source_onto_grid is false
 /// \throws PointOutOfBoundsException if \a p2 is off grid and project_target_onto_grid is false
 /// \retval range models
