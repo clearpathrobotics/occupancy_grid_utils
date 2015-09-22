@@ -41,10 +41,21 @@ optional<Cell> rayTraceOntoGrid (const nm::MapMetaData& info, const Cell& c1, co
 }
 
 RayTraceIterRange rayTrace (const nm::MapMetaData& info, const gm::Point& p1, const gm::Point& p2,
-                            bool project_onto_grid, bool project_source_onto_grid)
+                            bool project_onto_grid, bool project_source_onto_grid, 
+                            float max_range)
 {
+
+  gm::Point np2 = p2;
+  if (max_range > 0) {
+    double distance = euclideanDistance(p1,p2);
+    if (distance > max_range) {
+      np2.x = ((p2.x - p1.x) * max_range/distance) + p1.x;
+      np2.y = ((p2.y - p1.y) * max_range/distance) + p1.y;
+    }
+  }
+
   Cell c1 = pointCell(info, p1);
-  Cell c2 = pointCell(info, p2);
+  Cell c2 = pointCell(info, np2);
   ROS_DEBUG_STREAM_NAMED ("ray_trace", "Ray tracing between " << c1.x <<
                           ", " << c1.y << " and " << c2.x << ", " << c2.y);
   const RayTraceIterator done(c1, c1, true);
@@ -61,7 +72,7 @@ RayTraceIterRange rayTrace (const nm::MapMetaData& info, const gm::Point& p1, co
       throw PointOutOfBoundsException(p1);
   }
   
-  if (!withinBounds(info, p2)) {
+  if (!withinBounds(info, np2)) {
     if (project_onto_grid) {
       const optional<Cell> c = rayTraceOntoGrid(info, c1, c2);
       if (c)
@@ -70,7 +81,7 @@ RayTraceIterRange rayTrace (const nm::MapMetaData& info, const gm::Point& p1, co
         return empty_range;
     }
     else {
-      throw PointOutOfBoundsException(p2);
+      throw PointOutOfBoundsException(np2);
     }
   }
 

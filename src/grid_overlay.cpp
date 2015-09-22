@@ -66,14 +66,6 @@ inline gm::Point transformPt (const tf::Pose& trans, const gm::Point32& p)
   return transformed;
 }
 
-inline double euclideanDistance (const gm::Point& p1, const gm::Point& p2)
-{
-  const double dx=p1.x-p2.x;
-  const double dy=p1.y-p2.y;
-  const double dz=p1.z-p2.z;
-  return sqrt(dx*dx + dy*dy + dz*dz);
-}
-
 
 // This is our policy for computing the occupancy of a cell based on hit and pass through counts
 inline int8_t determineOccupancy (const unsigned hit_count, const unsigned pass_through_count, 
@@ -152,45 +144,42 @@ void addCloud (OverlayClouds* overlay, LocalizedCloud::ConstPtr cloud, const int
   // Iterate over points in this cloud
   BOOST_FOREACH (const gm::Point& p, transformed_points) {
   
-    // Skip point unless it's within the distance threshold
-    if (euclideanDistance(sensor_pos, p) < overlay->max_distance) {
-      ROS_DEBUG_NAMED ("overlay_counts", " Ray tracing to point %.2f, %.2f", p.x, p.y);
-      boost::optional<index_t> last_ind;
+    ROS_DEBUG_NAMED ("overlay_counts", " Ray tracing to point %.2f, %.2f", p.x, p.y);
+    boost::optional<index_t> last_ind;
 
-      const bool have_existing_grid = !overlay->grid.data.empty();
-      
-      // Inner loop: raytrace along the line and update counts
-      // We allow both the sensor pose and the target to be off the grid
-      BOOST_FOREACH (const Cell& c, rayTrace(overlay->grid.info, sensor_pos, p, true, true)) {
-        last_ind = cellIndex(overlay->grid.info, c);
-        overlay->pass_through_counts[*last_ind] += inc;
-        if (have_existing_grid && overlay->grid.data[*last_ind] == OCCUPIED)
-            break;
-        ROS_ASSERT(overlay->pass_through_counts[*last_ind]>=0);
-        ROS_DEBUG_NAMED ("overlay_counts", "  Pass-through counts for %d, %d are now %u", c.x, c.y, 
-                         overlay->pass_through_counts[*last_ind]);
-      }
+    const bool have_existing_grid = !overlay->grid.data.empty();
+    
+    // Inner loop: raytrace along the line and update counts
+    // We allow both the sensor pose and the target to be off the grid
+    BOOST_FOREACH (const Cell& c, rayTrace(overlay->grid.info, sensor_pos, p, true, true, overlay->max_distance)) {
+      last_ind = cellIndex(overlay->grid.info, c);
+      overlay->pass_through_counts[*last_ind] += inc;
+      if (have_existing_grid && overlay->grid.data[*last_ind] == OCCUPIED)
+          break;
+      ROS_ASSERT(overlay->pass_through_counts[*last_ind]>=0);
+      ROS_DEBUG_NAMED ("overlay_counts", "  Pass-through counts for %d, %d are now %u", c.x, c.y, 
+                       overlay->pass_through_counts[*last_ind]);
+    }
 
-      if (last_ind) {
-        // If the last cell equals the point (i.e., point is not off the grid), update hit counts
-        const Cell last_cell = indexCell(overlay->grid.info, *last_ind);
-        if (last_cell == pointCell(overlay->grid.info, p)) {
-          
+    if (last_ind) {
+      // If the last cell equals the point (i.e., point is not off the grid), update hit counts
+      const Cell last_cell = indexCell(overlay->grid.info, *last_ind);
+      if (last_cell == pointCell(overlay->grid.info, p)) {
+        
 #ifdef GRID_UTILS_GCC_46
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuninitialized"
 #endif
-          
-          overlay->hit_counts[*last_ind] += inc;
-          
+        
+        overlay->hit_counts[*last_ind] += inc;
+        
 #ifdef GRID_UTILS_GCC_46
 #pragma GCC diagnostic pop
 #endif
-          
-          ROS_ASSERT(overlay->hit_counts[*last_ind]>=0);
-          ROS_DEBUG_NAMED ("overlay_counts", "  Hit counts for %d, %d are now %u", last_cell.x, last_cell.y, 
-                           overlay->hit_counts[*last_ind]);
-        }
+        
+        ROS_ASSERT(overlay->hit_counts[*last_ind]>=0);
+        ROS_DEBUG_NAMED ("overlay_counts", "  Hit counts for %d, %d are now %u", last_cell.x, last_cell.y, 
+                         overlay->hit_counts[*last_ind]);
       }
     }
   }
