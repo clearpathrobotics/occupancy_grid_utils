@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>occupancy_grid_utils</name>
-  <version>0.0.6</version>
+  <version>0.0.7</version>
   <description>The catkinized Occupancy Grid Utils package</description>
   <maintainer email="yanma@clearpathrobotics.com">yanma</maintainer>
 

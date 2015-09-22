@@ -3,8 +3,8 @@ Changelog for package occupancy_grid_utils
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-Forthcoming
------------
+0.0.7 (2015-09-22)
+------------------
 * Merge pull request `#8 <https://github.com/clearpathrobotics/occupancy_grid_utils/issues/8>`_ from clearpathrobotics/raytrace_free_space
   Raytrace free space based on max_distance
 * Update raytrace comment
