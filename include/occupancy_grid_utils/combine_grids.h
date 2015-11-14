@@ -54,10 +54,10 @@ namespace occupancy_grid_utils
 /// OCCUPIED (100) goes to -1.  Then take the max.  If there are no intersecting cells, value is -1. 
 ///
 /// Assumes all grids lie on the xy plane, and will fail in weird ways if that's not true
-nav_msgs::OccupancyGrid::Ptr combineGrids(const std::vector<nav_msgs::OccupancyGrid::ConstPtr>& grids, double resolution);
+void combineGrids(const std::vector<const nav_msgs::OccupancyGrid*>& grids, double resolution, nav_msgs::OccupancyGrid& result);
 
 /// Version of combineGrids that uses the resolution of the first grid.
-nav_msgs::OccupancyGrid::Ptr combineGrids(const std::vector<nav_msgs::OccupancyGrid::ConstPtr>& grids);
+void combineGrids (const std::vector<const nav_msgs::OccupancyGrid*>& grids, nav_msgs::OccupancyGrid& result);
 
 
 

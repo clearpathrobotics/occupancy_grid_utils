@@ -179,7 +179,7 @@ gm::Pose transformPose (const tf::Pose trans, const gm::Pose p)
 }
 
 // Get the dimensions of a combined grid
-nm::MapMetaData getCombinedGridInfo (const vector<GridConstPtr>& grids, const double resolution)
+nm::MapMetaData getCombinedGridInfo (const vector<const nav_msgs::OccupancyGrid*>& grids, const double resolution)
 {
   ROS_ASSERT (!grids.empty());
   nm::MapMetaData info;
@@ -194,7 +194,7 @@ nm::MapMetaData getCombinedGridInfo (const vector<GridConstPtr>& grids, const do
 #endif
 
   boost::optional<double> min_x, max_x, min_y, max_y;
-  BOOST_FOREACH (const GridConstPtr& g, grids) {
+  BOOST_FOREACH (const nav_msgs::OccupancyGrid *g, grids) {
     nm::MapMetaData grid_info = g->info;
     grid_info.origin = transformPose(trans.inverse(), g->info.origin);
     if (!(min_x && *min_x < minX(grid_info)))
@@ -229,15 +229,14 @@ nm::MapMetaData getCombinedGridInfo (const vector<GridConstPtr>& grids, const do
 
 
 // Main function
-GridPtr combineGrids (const vector<GridConstPtr>& grids, const double resolution)
+void combineGrids (const vector<const nav_msgs::OccupancyGrid*>& grids, const double resolution, nav_msgs::OccupancyGrid& combined_grid)
 {
-  GridPtr combined_grid(new nm::OccupancyGrid());
-  combined_grid->info = getCombinedGridInfo(grids, resolution);
-  combined_grid->data.resize(combined_grid->info.width*combined_grid->info.height);
-  fill(combined_grid->data.begin(), combined_grid->data.end(), -1);
+  combined_grid.info = getCombinedGridInfo(grids, resolution);
+  combined_grid.data.resize(combined_grid.info.width*combined_grid.info.height);
+  fill(combined_grid.data.begin(), combined_grid.data.end(), -1);
   ROS_DEBUG_NAMED ("combine_grids", "Combining %zu grids", grids.size());
 
-  BOOST_FOREACH (const GridConstPtr& grid, grids) {
+  BOOST_FOREACH (const nav_msgs::OccupancyGrid *grid, grids) {
     for (coord_t x=0; x<(int)grid->info.width; x++) {
       for (coord_t y=0; y<(int)grid->info.height; y++) {
         const Cell cell(x, y);
@@ -246,9 +245,9 @@ GridPtr combineGrids (const vector<GridConstPtr>& grids, const double resolution
         // Only proceed if the value is not unknown 
         if ((value>=0) && (value<=100)) {
           BOOST_FOREACH (const Cell& intersecting_cell, 
-                         intersectingCells(combined_grid->info, grid->info, cell)) {
-            const index_t ind = cellIndex(combined_grid->info, intersecting_cell);
-            combined_grid->data[ind] = max(combined_grid->data[ind], value);
+                         intersectingCells(combined_grid.info, grid->info, cell)) {
+            const index_t ind = cellIndex(combined_grid.info, intersecting_cell);
+            combined_grid.data[ind] = max(combined_grid.data[ind], value);
           }
         }
       }
@@ -256,14 +255,13 @@ GridPtr combineGrids (const vector<GridConstPtr>& grids, const double resolution
   }
 
   ROS_DEBUG_NAMED ("combine_grids", "Done combining grids");
-  return combined_grid;
 }
 
 
-GridPtr combineGrids (const vector<GridConstPtr>& grids)
+void combineGrids (const vector<const nav_msgs::OccupancyGrid*>& grids, nav_msgs::OccupancyGrid& result)
 {
   ROS_ASSERT (!grids.empty());
-  return combineGrids(grids, grids[0]->info.resolution);
+  combineGrids(grids, grids[0]->info.resolution, result);
 }
 
 
