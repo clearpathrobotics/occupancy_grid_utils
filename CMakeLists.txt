@@ -36,9 +36,8 @@ generate_messages(
 
 catkin_package(
   INCLUDE_DIRS include
-  LIBRARIES grid_utils grid_utils_boost_python_exports
+  LIBRARIES grid_utils
   CATKIN_DEPENDS nav_msgs geometry_msgs sensor_msgs laser_geometry roscpp rospy tf tf2_bullet message_runtime
-  DEPENDS system_lib
 )
 
 
