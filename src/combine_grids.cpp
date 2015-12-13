@@ -44,6 +44,7 @@
 #include <boost/optional.hpp>
 #include <boost/bind.hpp>
 #include <boost/ref.hpp>
+#include <boost/make_shared.hpp> /* used only in deprecated functions */
 #include <set>
 #include "gcc_version.h"
 
@@ -61,9 +62,6 @@ using std::multiset;
 using std::set;
 using std::min;
 using std::max;
-
-typedef boost::shared_ptr<nm::OccupancyGrid> GridPtr;
-typedef boost::shared_ptr<nm::OccupancyGrid const> GridConstPtr;
 
 inline Cell point32Cell (const nm::MapMetaData& info, const gm::Point32& p)
 {
@@ -264,6 +262,29 @@ void combineGrids (const vector<const nav_msgs::OccupancyGrid*>& grids, nav_msgs
   combineGrids(grids, grids[0]->info.resolution, result);
 }
 
+/* deprecated functions */
+
+typedef boost::shared_ptr<nm::OccupancyGrid> GridPtr;
+typedef boost::shared_ptr<nm::OccupancyGrid const> GridConstPtr;
+
+nav_msgs::OccupancyGrid::Ptr combineGrids(const std::vector<nav_msgs::OccupancyGrid::ConstPtr>& grids, double resolution) {
+  vector<const nav_msgs::OccupancyGrid*> grids_ptrs;
+  grids_ptrs.reserve(grids.size());
+  nav_msgs::OccupancyGrid::Ptr result = boost::make_shared<nm::OccupancyGrid>();
+
+  BOOST_FOREACH (const GridConstPtr& g, grids) {
+    grids_ptrs.push_back(g.get());
+  }
+
+  combineGrids(grids_ptrs, resolution, *result);
+
+  return result;
+}
+
+nav_msgs::OccupancyGrid::Ptr combineGrids(const std::vector<nav_msgs::OccupancyGrid::ConstPtr>& grids) {
+  ROS_ASSERT (!grids.empty());
+  return combineGrids(grids, grids[0]->info.resolution);
+}
 
 } // namespace occupancy_grid_utils
 

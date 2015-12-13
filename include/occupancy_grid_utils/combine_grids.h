@@ -59,7 +59,19 @@ void combineGrids(const std::vector<const nav_msgs::OccupancyGrid*>& grids, doub
 /// Version of combineGrids that uses the resolution of the first grid.
 void combineGrids (const std::vector<const nav_msgs::OccupancyGrid*>& grids, nav_msgs::OccupancyGrid& result);
 
+/* for backward compatibility */
 
+/// Version of combineGrids that uses shared_ptr
+/// 
+/// you should use combineGrids with raw pointers instead, which saves reference counting
+/// \deprecated
+nav_msgs::OccupancyGrid::Ptr combineGrids(const std::vector<nav_msgs::OccupancyGrid::ConstPtr>& grids, double resolution);
+
+/// Version of combineGrids that uses shared_ptr
+/// 
+/// you should use combineGrids with raw pointers instead, which saves reference counting
+/// \deprecated
+nav_msgs::OccupancyGrid::Ptr combineGrids(const std::vector<nav_msgs::OccupancyGrid::ConstPtr>& grids);
 
 } // namespace occupancy_grid_utils
 
