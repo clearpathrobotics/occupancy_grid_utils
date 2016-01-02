@@ -107,13 +107,8 @@ nav_msgs::MapMetaData getCombinedGridInfo (ForwardIt first, ForwardIt last, cons
   tf::Pose trans;
   const nav_msgs::OccupancyGrid& first_ref = *first; // needed to support reference_wrapper
   tf::poseMsgToTF(first_ref.info.origin, trans);
-
-#ifdef GRID_UTILS_GCC_46
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuninitialized"
-#endif
-
   boost::optional<double> min_x, max_x, min_y, max_y;
+
   for (ForwardIt grid_it = first; grid_it != last; ++grid_it) {
     const nav_msgs::OccupancyGrid& grid = *grid_it; // needed to support reference_wrapper
     nav_msgs::MapMetaData grid_info = grid.info;
@@ -132,10 +127,6 @@ nav_msgs::MapMetaData getCombinedGridInfo (ForwardIt first, ForwardIt last, cons
   const double dx = *max_x - *min_x;
   const double dy = *max_y - *min_y;
   ROS_ASSERT ((dx > 0) && (dy > 0));
-
-#ifdef GRID_UTILS_GCC_46
-#pragma GCC diagnostic pop
-#endif
 
   geometry_msgs::Pose pose_in_grid_frame;
   pose_in_grid_frame.position.x = *min_x;

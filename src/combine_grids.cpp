@@ -41,7 +41,6 @@
 #include <boost/bind.hpp>
 #include <boost/ref.hpp>
 #include <boost/make_shared.hpp> /* used only in deprecated functions */
-#include "gcc_version.h"
 
 namespace occupancy_grid_utils
 {
