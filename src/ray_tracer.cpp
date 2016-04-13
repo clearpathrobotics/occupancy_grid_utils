@@ -41,7 +41,7 @@ optional<Cell> rayTraceOntoGrid (const nm::MapMetaData& info, const Cell& c1, co
 }
 
 RayTraceIterRange rayTrace (const nm::MapMetaData& info, const gm::Point& p1, const gm::Point& p2,
-                            bool project_onto_grid, bool project_source_onto_grid, 
+                            bool project_target_onto_grid, bool project_source_onto_grid,
                             float max_range)
 {
 
@@ -71,9 +71,9 @@ RayTraceIterRange rayTrace (const nm::MapMetaData& info, const gm::Point& p1, co
     else
       throw PointOutOfBoundsException(p1);
   }
-  
+
   if (!withinBounds(info, np2)) {
-    if (project_onto_grid) {
+    if (project_target_onto_grid) {
       const optional<Cell> c = rayTraceOntoGrid(info, c1, c2);
       if (c)
         c2 = *c;
@@ -97,7 +97,7 @@ gm::Point rayEndPoint (const gm::Point& p0, const double theta, const double d)
   p.x = p0.x + cos(theta)*d;
   p.y = p0.y + sin(theta)*d;
   return p;
-}                       
+}
 
 sm::LaserScan::Ptr
 simulateRangeScan (const nm::OccupancyGrid& grid, const gm::Pose& sensor_pose,
@@ -118,9 +118,9 @@ simulateRangeScan (const nm::OccupancyGrid& grid, const gm::Pose& sensor_pose,
     const double theta = scanner_info.angle_min+i*scanner_info.angle_increment;
     const gm::Point scan_max =
       rayEndPoint(p0, theta0 + theta, scanner_info.range_max+1);
-    
+
     result->ranges[i] = scanner_info.range_max+1; // Default if loop terminates
-    BOOST_FOREACH (const Cell& c, rayTrace(grid.info, p0, scan_max, true))
+    BOOST_FOREACH (const Cell& c, rayTrace(grid.info, p0, scan_max, true, true))
     {
       const gm::Point p = cellCenter(grid.info, c);
       const double d = sqrt(pow(p.x-p0.x, 2) + pow(p.y-p0.y, 2));
