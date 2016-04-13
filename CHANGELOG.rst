@@ -3,6 +3,25 @@ Changelog for package occupancy_grid_utils
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
+Forthcoming
+-----------
+* Merge pull request `#11 <https://github.com/clearpathrobotics/occupancy_grid_utils/issues/11>`_ from clearpathrobotics/CORE-3712_handle_raytrace_out_of_bounds
+  Handle raytrace out of bounds
+* :lipstick:
+* Rename project_target_onto_grid param in cpp
+  Make the name in the cpp consistent with the name in the header.
+* Project target onto grid
+  fixes CORE-3712
+  This projects the target point onto the grid before ray tracing, so
+  it'll never fail to produce a scan, even if the robot is outside the
+  map.
+* Change maintainer
+* Merge pull request `#9 <https://github.com/clearpathrobotics/occupancy_grid_utils/issues/9>`_ from hrnr/build-fix
+  do not export python library
+* do not export python library
+  it is outdated (eg. generates messages) and gets linked to c++ code which then have dependency on python
+* Contributors: Enrique Fernandez, Enrique Fernández Perdomo, James Servos, Jiri Horner
+
 0.0.7 (2015-09-22)
 ------------------
 * Merge pull request `#8 <https://github.com/clearpathrobotics/occupancy_grid_utils/issues/8>`_ from clearpathrobotics/raytrace_free_space
