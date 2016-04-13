@@ -3,8 +3,8 @@ Changelog for package occupancy_grid_utils
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-Forthcoming
------------
+0.0.8 (2016-04-13)
+------------------
 * Merge pull request `#11 <https://github.com/clearpathrobotics/occupancy_grid_utils/issues/11>`_ from clearpathrobotics/CORE-3712_handle_raytrace_out_of_bounds
   Handle raytrace out of bounds
 * :lipstick:
