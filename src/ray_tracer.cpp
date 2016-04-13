@@ -41,7 +41,7 @@ optional<Cell> rayTraceOntoGrid (const nm::MapMetaData& info, const Cell& c1, co
 }
 
 RayTraceIterRange rayTrace (const nm::MapMetaData& info, const gm::Point& p1, const gm::Point& p2,
-                            bool project_onto_grid, bool project_source_onto_grid, 
+                            bool project_target_onto_grid, bool project_source_onto_grid,
                             float max_range)
 {
 
@@ -71,9 +71,9 @@ RayTraceIterRange rayTrace (const nm::MapMetaData& info, const gm::Point& p1, co
     else
       throw PointOutOfBoundsException(p1);
   }
-  
+
   if (!withinBounds(info, np2)) {
-    if (project_onto_grid) {
+    if (project_target_onto_grid) {
       const optional<Cell> c = rayTraceOntoGrid(info, c1, c2);
       if (c)
         c2 = *c;
