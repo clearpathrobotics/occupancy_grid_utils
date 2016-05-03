@@ -122,12 +122,10 @@ void addKnownFreePoint (OverlayClouds* overlay, const gm::Point& p, const double
 
 void addCloud (OverlayClouds* overlay, LocalizedCloud::ConstPtr cloud, const int inc)
 {
-  
   ROS_ASSERT_MSG(overlay->frame_id==cloud->header.frame_id,
                  "Frame id %s of overlayed cloud didn't match existing one %s",
                  cloud->header.frame_id.c_str(), overlay->frame_id.c_str());
-  const index_t num_cells = overlay->grid.info.width*overlay->grid.info.height;
-  ROS_ASSERT(num_cells>0);
+  ROS_ASSERT(overlay->grid.info.width*overlay->grid.info.height > 0);
 
   const gm::Point& sensor_pos = cloud->sensor_pose.position;
   ROS_DEBUG_NAMED ("overlay", "Ray tracing from %.2f, %.2f", sensor_pos.x, sensor_pos.y);
