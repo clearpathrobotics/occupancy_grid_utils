@@ -117,16 +117,18 @@ simulateRangeScan (const nm::OccupancyGrid& grid, const gm::Pose& sensor_pose,
   {
     const double theta = scanner_info.angle_min+i*scanner_info.angle_increment;
     const gm::Point scan_max =
-      rayEndPoint(p0, theta0 + theta, scanner_info.range_max+1);
+      rayEndPoint(p0, theta0 + theta, scanner_info.range_max + grid.info.resolution);
 
-    result->ranges[i] = scanner_info.range_max+1; // Default if loop terminates
+    result->ranges[i] = scanner_info.range_max; // Default if loop terminates
     BOOST_FOREACH (const Cell& c, rayTrace(grid.info, p0, scan_max, true, true))
     {
       const gm::Point p = cellCenter(grid.info, c);
       const double d = sqrt(pow(p.x-p0.x, 2) + pow(p.y-p0.y, 2));
       char data = grid.data[cellIndex(grid.info, c)];
       if (d > scanner_info.range_max)
+      {
         break;
+      }
       else if (data == OCCUPIED && !(c==c0))
       {
         result->ranges[i] = d;
@@ -134,7 +136,7 @@ simulateRangeScan (const nm::OccupancyGrid& grid, const gm::Pose& sensor_pose,
       }
       else if (data == UNKNOWN && !(c==c0))
       {
-        result->ranges[i] = unknown_obstacles ? d : scanner_info.range_max+1;
+        result->ranges[i] = unknown_obstacles ? d : scanner_info.range_max;
         break;
       }
     }
