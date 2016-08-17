@@ -117,7 +117,7 @@ simulateRangeScan (const nm::OccupancyGrid& grid, const gm::Pose& sensor_pose,
   {
     const double theta = scanner_info.angle_min+i*scanner_info.angle_increment;
     const gm::Point scan_max =
-      rayEndPoint(p0, theta0 + theta, scanner_info.range_max + 1);
+      rayEndPoint(p0, theta0 + theta, scanner_info.range_max + grid.info.resolution);
 
     result->ranges[i] = scanner_info.range_max; // Default if loop terminates
     BOOST_FOREACH (const Cell& c, rayTrace(grid.info, p0, scan_max, true, true))
