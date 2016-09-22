@@ -3,6 +3,23 @@ Changelog for package occupancy_grid_utils
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
+Forthcoming
+-----------
+* Fix using overlay as pointer
+* Merge pull request `#14 <https://github.com/clearpathrobotics/occupancy_grid_utils/issues/14>`_ from clearpathrobotics/CORE-5273_saturate_counts
+  Allow to saturate counts
+* Allow to saturate counts
+  refs CORE-5273
+* Merge pull request `#13 <https://github.com/clearpathrobotics/occupancy_grid_utils/issues/13>`_ from clearpathrobotics/simulate_scan_max_range
+  Fix Max Range of Simulated Scan
+* Raytrace to range_max + resolution instead of range_max + 1
+* Fix Max Range of Simulated Scan
+  Set the value for open space and unkown to max_range instead of max_range + 1
+* Merge pull request `#12 <https://github.com/clearpathrobotics/occupancy_grid_utils/issues/12>`_ from clearpathrobotics/minor_fix_unused_var
+  Remove unused variable (only used on assert)
+* Remove unused variable (only used on assert)
+* Contributors: Adel Fakih, Enrique Fernandez, Enrique Fernández Perdomo, James Servos, afakihcpr
+
 0.0.8 (2016-04-13)
 ------------------
 * Merge pull request `#11 <https://github.com/clearpathrobotics/occupancy_grid_utils/issues/11>`_ from clearpathrobotics/CORE-3712_handle_raytrace_out_of_bounds
