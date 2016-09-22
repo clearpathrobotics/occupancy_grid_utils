@@ -122,7 +122,7 @@ void addKnownFreePoint (OverlayClouds* overlay, const gm::Point& p, const double
       {
         const index_t ind = cellIndex(geom, c2);
         overlay->hit_counts[ind] = 0;
-        overlay->pass_through_counts[ind] = overlay->min_pass_through * increment(overlay.occupancy_threshold) + 1;
+        overlay->pass_through_counts[ind] = overlay->min_pass_through * increment(overlay->occupancy_threshold) + 1;
       }
     }
   }
