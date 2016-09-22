@@ -3,8 +3,8 @@ Changelog for package occupancy_grid_utils
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-Forthcoming
------------
+0.0.9 (2016-09-22)
+------------------
 * Fix using overlay as pointer
 * Merge pull request `#14 <https://github.com/clearpathrobotics/occupancy_grid_utils/issues/14>`_ from clearpathrobotics/CORE-5273_saturate_counts
   Allow to saturate counts
