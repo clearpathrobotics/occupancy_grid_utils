@@ -53,6 +53,8 @@ namespace nm=nav_msgs;
 using boost::bind;
 using boost::ref;
 using std::vector;
+using std::ceil;
+using std::max;
 
 typedef boost::shared_ptr<nm::OccupancyGrid> GridPtr;
 typedef boost::shared_ptr<nm::OccupancyGrid const> GridConstPtr;
@@ -66,6 +68,13 @@ inline gm::Point transformPt (const tf::Pose& trans, const gm::Point32& p)
   return transformed;
 }
 
+
+// Computes increment from the occupancy threshold to avoid underflow issues
+// when saturating the counts
+inline size_t increment (const double occupancy_threshold)
+{
+  return std::ceil(1.0 / occupancy_threshold);
+}
 
 // This is our policy for computing the occupancy of a cell based on hit and pass through counts
 inline int8_t determineOccupancy (const unsigned hit_count, const unsigned pass_through_count, 
@@ -113,7 +122,7 @@ void addKnownFreePoint (OverlayClouds* overlay, const gm::Point& p, const double
       {
         const index_t ind = cellIndex(geom, c2);
         overlay->hit_counts[ind] = 0;
-        overlay->pass_through_counts[ind] = overlay->min_pass_through+1;
+        overlay->pass_through_counts[ind] = overlay->min_pass_through * increment(overlay.occupancy_threshold) + 1;
       }
     }
   }
@@ -187,12 +196,12 @@ void addCloud (OverlayClouds* overlay, LocalizedCloud::ConstPtr cloud, const int
 
 void addCloud (OverlayClouds* overlay, LocalizedCloud::ConstPtr cloud)
 {
-  addCloud(overlay, cloud, 1);
+  addCloud(overlay, cloud, increment(overlay->occupancy_threshold));
 }
 
 void removeCloud (OverlayClouds* overlay, LocalizedCloud::ConstPtr cloud)
 {
-  addCloud(overlay, cloud, -1);
+  addCloud(overlay, cloud, -increment(overlay->occupancy_threshold));
 }
 
 
@@ -206,7 +215,7 @@ GridPtr getGrid (const OverlayClouds& overlay)
   grid->data.resize(overlay.grid.info.width*overlay.grid.info.height);
   transform(overlay.hit_counts.begin(), overlay.hit_counts.end(), overlay.pass_through_counts.begin(), 
             grid->data.begin(), bind(determineOccupancy, _1, _2, overlay.occupancy_threshold,
-                                     overlay.min_pass_through));
+                                     overlay.min_pass_through * increment(overlay.occupancy_threshold)));
   return grid;
 }
 
@@ -214,6 +223,27 @@ void resetCounts (OverlayClouds* overlay)
 {
   fill(overlay->hit_counts.begin(), overlay->hit_counts.end(), 0);
   fill(overlay->pass_through_counts.begin(), overlay->pass_through_counts.end(), 0);
+}
+
+void saturateCounts (OverlayClouds& overlay)
+{
+  saturateCounts(overlay, 0);
+}
+
+void saturateCounts (OverlayClouds& overlay, const size_t steps)
+{
+  for (size_t i = 0; i < overlay.hit_counts.size(); ++i)
+  {
+    const unsigned hit_count = overlay.hit_counts[i];
+    const unsigned pass_through_count = overlay.pass_through_counts[i];
+
+    const double occupancy_threshold = overlay.occupancy_threshold;
+    const double hit_threshold = pass_through_count * occupancy_threshold;
+
+    overlay.hit_counts[i] = hit_count > hit_threshold ?
+                            hit_threshold + steps + 1 :
+                            std::max(hit_threshold - steps, 0.0);
+  }
 }
 
 nm::MapMetaData gridInfo (const OverlayClouds& overlay) 
