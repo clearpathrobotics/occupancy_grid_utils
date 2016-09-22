@@ -113,6 +113,12 @@ nav_msgs::OccupancyGrid::Ptr getGrid (const OverlayClouds& overlay);
 // \brief Reset all counts to initial state in \a overlay
 void resetCounts (OverlayClouds* overlay);
 
+// \brief Saturate hit counts to the closest value to the threshold
+void saturateCounts (OverlayClouds& overlay);
+
+// \brief Saturate hit counts to the closest (by a given number of steps/observation) value to the threshold
+void saturateCounts (OverlayClouds& overlay, const size_t steps);
+
 // \brief Get the occupancy grid dimensions.
 nav_msgs::MapMetaData gridInfo (const OverlayClouds& overlay);
   
