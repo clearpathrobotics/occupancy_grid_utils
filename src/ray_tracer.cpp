@@ -90,103 +90,36 @@ RayTraceIterRange rayTrace (const nm::MapMetaData& info, const gm::Point& p1, co
   return rayTrace(c1, c2);
 }
 
-// Singleton class to generate points at max range of each ray
-// of a scan from a specified sensor pose
-// Caches the points and as long as the scan properties are
-// the same, only a transformation to the new sensor pose is applied
-class ScanEndPoints
+
+gm::Point rayEndPoint (const gm::Point& p0, const double theta, const double d)
 {
-private:
-  ScanEndPoints()
-    : angle_min_(0.0)
-    , angle_max_(0.0)
-    , range_max_(0.0)
-    , angle_increment_(0.0)
-  {}
-  ScanEndPoints(const ScanEndPoints&);
-  void operator=(const ScanEndPoints&);
-
-public:
-  typedef std::vector<gm::Point>::const_iterator PointIter;
-  typedef std::pair<PointIter, PointIter> PointRange;
-
-  static ScanEndPoints& getInstance()
-  {
-    static ScanEndPoints instance;
-    return instance;
-  }
-
-  PointRange operator()(const sm::LaserScan& scanner_info, const gm::Pose& sensor_pose)
-  {
-    validate(scanner_info);
-    transform(sensor_pose);
-    return std::make_pair(points_.begin(), points_.end());
-  }
-
-private:
-  void validate(const sm::LaserScan& info)
-  {
-    if (angle_min_ == info.angle_min && angle_max_ == info.angle_max &&
-       range_max_ == info.range_max && angle_increment_ == info.angle_increment)
-    {
-      return;
-    }
-    else createPoints(info);
-  }
-
-  void transform(const gm::Pose& sensor_pose)
-  {
-    tf::Transform pose;
-    tf::poseMsgToTF(sensor_pose, pose);
-
-    for (size_t i = 0; i < tf_points_.size(); ++i)
-    {
-      tf::pointTFToMsg(pose * tf_points_[i], points_[i]);
-    }
-  }
-
-  void createPoints(const sm::LaserScan& info)
-  {
-    angle_min_ = info.angle_min;
-    angle_max_ = info.angle_max;
-    range_max_ = info.range_max;
-    angle_increment_ = info.angle_increment;
-
-    const unsigned int size = round(1 + (angle_max_ - angle_min_)/angle_increment_);
-    tf_points_.reserve(size);
-    points_.resize(size);
-
-    double angle = angle_min_;
-
-    for (size_t i = 0; i < size; ++i, angle += angle_increment_)
-    {
-      const double cos_angle = cos(angle);
-      const double sin_angle = sin(angle);
-
-      tf_points_.push_back(tf::Point(cos_angle * range_max_, sin_angle * range_max_, 0));
-    }
-  }
-
-  std::vector<gm::Point> points_;
-  std::vector<tf::Point> tf_points_;
-  double angle_min_;
-  double angle_max_;
-  double range_max_;
-  double angle_increment_;
-};
+  gm::Point p;
+  p.x = p0.x + cos(theta)*d;
+  p.y = p0.y + sin(theta)*d;
+  return p;
+}
 
 sm::LaserScan::Ptr
 simulateRangeScan (const nm::OccupancyGrid& grid, const gm::Pose& sensor_pose,
                    const sm::LaserScan& scanner_info, const bool unknown_obstacles)
 {
   sm::LaserScan::Ptr result(new sm::LaserScan(scanner_info));
-  result->ranges.clear();
+
+  const double angle_range = scanner_info.angle_max - scanner_info.angle_min;
+  const unsigned n =
+    (unsigned) round(1+angle_range/scanner_info.angle_increment);
   const gm::Point& p0 = sensor_pose.position;
   const Cell c0 = pointCell(grid.info, p0);
+  const double theta0 = tf::getYaw(sensor_pose.orientation);
+  result->ranges.resize(n);
 
-  BOOST_FOREACH (const gm::Point& scan_max, ScanEndPoints::getInstance()(scanner_info, sensor_pose))
+  for (unsigned i=0; i<n; i++)
   {
-    result->ranges.push_back(scanner_info.range_max); // Default if loop terminates
+    const double theta = scanner_info.angle_min+i*scanner_info.angle_increment;
+    const gm::Point scan_max =
+      rayEndPoint(p0, theta0 + theta, scanner_info.range_max + grid.info.resolution);
+
+    result->ranges[i] = scanner_info.range_max; // Default if loop terminates
     BOOST_FOREACH (const Cell& c, rayTrace(grid.info, p0, scan_max, true, true))
     {
       const gm::Point p = cellCenter(grid.info, c);
@@ -198,12 +131,12 @@ simulateRangeScan (const nm::OccupancyGrid& grid, const gm::Pose& sensor_pose,
       }
       else if (data == OCCUPIED && !(c==c0))
       {
-        result->ranges.back() = d;
+        result->ranges[i] = d;
         break;
       }
       else if (data == UNKNOWN && !(c==c0))
       {
-        result->ranges.back() = unknown_obstacles ? d : scanner_info.range_max;
+        result->ranges[i] = unknown_obstacles ? d : scanner_info.range_max;
         break;
       }
     }
