@@ -3,6 +3,18 @@ Changelog for package occupancy_grid_utils
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
+Forthcoming
+-----------
+* Clear tf_points\_ in CreatePoints in ScanEndPoints
+* compile with c++11
+* Add support for inverted scans in simulateRangeScan
+  Also cache the points so cos and sin are not re-computed for every scan.
+* Revert "Add support for inverted scans in simulateRangeScan"
+  This reverts commit 0f3ef87223423d31a51f573c4c99aad34b447505.
+* Add support for inverted scans in simulateRangeScan
+  Also cache the points so cos and sin are not re-computed for every scan.
+* Contributors: Adel Fakih
+
 0.0.9 (2016-09-22)
 ------------------
 * Fix using overlay as pointer
