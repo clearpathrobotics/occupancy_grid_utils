@@ -60,15 +60,18 @@ add_library(grid_utils
 )
 add_dependencies(grid_utils occupancy_grid_utils_generate_messages_cpp)
 target_link_libraries(grid_utils ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+set_target_properties(grid_utils PROPERTIES COMPILE_OPTIONS "-std=c++11")
 
 add_executable(grid_construction_node
     src/examples/grid_construction_node.cpp)
 add_dependencies(grid_construction_node occupancy_grid_utils_generate_messages_cpp)
+set_target_properties(grid_construction_node PROPERTIES COMPILE_OPTIONS "-std=c++11")
 target_link_libraries(grid_construction_node
     grid_utils ${catkin_LIBRARIES})
 
 # Python stuff
 add_library(grid_utils_boost_python_exports src/boost_python_exports.cpp)
+set_target_properties(grid_utils_boost_python_exports PROPERTIES COMPILE_OPTIONS "-std=c++11")
 target_link_libraries(grid_utils_boost_python_exports grid_utils ${PYTHON_LIBRARIES} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
 #############
