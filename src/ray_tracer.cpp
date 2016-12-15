@@ -153,6 +153,7 @@ private:
     angle_increment_ = info.angle_increment;
 
     const unsigned int size = round(1 + (angle_max_ - angle_min_)/angle_increment_);
+    tf_points_.clear();
     tf_points_.reserve(size);
     points_.resize(size);
 
