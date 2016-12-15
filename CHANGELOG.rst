@@ -3,8 +3,8 @@ Changelog for package occupancy_grid_utils
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-Forthcoming
------------
+0.0.10 (2016-12-15)
+-------------------
 * Clear tf_points\_ in CreatePoints in ScanEndPoints
 * compile with c++11
 * Add support for inverted scans in simulateRangeScan
