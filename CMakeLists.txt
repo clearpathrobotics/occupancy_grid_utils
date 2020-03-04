@@ -12,7 +12,7 @@ find_package(
 
 ## Add find-modules and define external dependencies
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
-find_package(Boost REQUIRED COMPONENTS system signals python)
+find_package(Boost REQUIRED COMPONENTS system python)
 find_package(Eigen3 REQUIRED)
 find_package(PythonLibs REQUIRED)
 find_package(Bullet REQUIRED)
