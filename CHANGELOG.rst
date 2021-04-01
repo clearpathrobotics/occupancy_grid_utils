@@ -3,8 +3,8 @@ Changelog for package occupancy_grid_utils
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-Forthcoming
------------
+0.0.11 (2021-04-01)
+-------------------
 * Drop signals boost component.
 * Contributors: Mike Purvis
 
