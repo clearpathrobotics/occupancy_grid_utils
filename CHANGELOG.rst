@@ -3,6 +3,11 @@ Changelog for package occupancy_grid_utils
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
+0.0.11 (2021-04-01)
+-------------------
+* Drop signals boost component.
+* Contributors: Mike Purvis
+
 0.0.10 (2016-12-15)
 -------------------
 * Clear tf_points\_ in CreatePoints in ScanEndPoints
