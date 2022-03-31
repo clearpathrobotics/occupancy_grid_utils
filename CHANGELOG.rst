@@ -3,6 +3,11 @@ Changelog for package occupancy_grid_utils
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
+Forthcoming
+-----------
+* changes for building in ROS Noetic
+* Contributors: José Mastrangelo
+
 0.0.11 (2021-04-01)
 -------------------
 * Drop signals boost component.
