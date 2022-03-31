@@ -3,8 +3,8 @@ Changelog for package occupancy_grid_utils
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-Forthcoming
------------
+0.1.0 (2022-03-31)
+------------------
 * changes for building in ROS Noetic
 * Contributors: José Mastrangelo
 
