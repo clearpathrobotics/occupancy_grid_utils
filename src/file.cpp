@@ -88,7 +88,7 @@ loadMapFromFile(nav_msgs::GetMap::Response* resp,
               fname + std::string("\"");
       throw std::runtime_error(errmsg);
   }
-  cvtColor(imgColor, img, CV_BGR2GRAY);
+  cvtColor(imgColor, img, cv::COLOR_BGR2GRAY);
 
   // Copy the image data into the map structure
   resp->map.info.width = img.rows;
@@ -113,7 +113,7 @@ loadMapFromFile(nav_msgs::GetMap::Response* resp,
     for (i = 0; i < resp->map.info.width; i++)
     {
       // Compute mean of RGB for this pixel
-      color_avg = (double)(img.at<uint8_t>(i, j));
+      color_avg = static_cast<double>(img.at<uint8_t>(i, j));
 
       // If negate is true, we consider blacker pixels free, and whiter
       // pixels free.  Otherwise, it's vice versa.
