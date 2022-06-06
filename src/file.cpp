@@ -88,7 +88,7 @@ loadMapFromFile(nav_msgs::GetMap::Response* resp,
               fname + std::string("\"");
       throw std::runtime_error(errmsg);
   }
-  cvtColor(imgColor, img, CV_BGR2GRAY);
+  cvtColor(imgColor, img, cv::COLOR_BGR2GRAY);
 
   // Copy the image data into the map structure
   resp->map.info.width = img.rows;
